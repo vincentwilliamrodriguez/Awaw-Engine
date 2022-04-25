@@ -39,8 +39,6 @@ var lastj = 7
 var lastPossibleMoves = []
 var gameOver = false
 
-#var castlingRules = [[true, true], [true, true]] #[[Black QS, Black KS], [White QS, White KS]]
-#var enPassant = [9, 9] # 1 square behind last pawn moved
 var gameRules = [ [[true, true], [true, true]], #Castling rules
 				[9, 9]] #En Passant
 var turn = 1
@@ -72,7 +70,6 @@ func combine2d(inp1: Array, inp2: Array) -> Array:
 	for i in inp1.size():
 		for j in inp1.size():
 			inp1[i][j] = 1 if inp1[i][j] == 1 or inp2[i][j] == 1 else 0
-			
 	return inp1
 	
 func highlight(i,j):
@@ -120,8 +117,8 @@ func nextTurn(i = 9, j = 9):
 		print('Game Over, Black wins!')
 		gameOver = true
 		
-#	if not turn:
-#		thread.start(self, "AwawEngine", [pieces.duplicate(true), gameRules.duplicate(true), turn])
+	if not turn and not gameOver:
+		thread.start(self, "AwawEngine", [pieces.duplicate(true), gameRules.duplicate(true), turn])
 	
 func rays(res, dir, i, j, color, lim = 9, uniquePiece = -1, t = false, 
 			inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):
@@ -317,12 +314,19 @@ func AwawEngine(inputs: Array):
 	var rules = inputs[1].duplicate(true)
 	var color = inputs[2]
 	
+	var start = OS.get_ticks_msec()
+	
 	print('Thinking')
+	
 	var temp = miniMax(inp, rules, color, 2)
 	pieces = temp[0]
 	gameRules = temp[1]
+	
+	var end = OS.get_ticks_msec()
+	
 	print('Done ' + String(num))
-	print('Optimal Score: '+String(temp[2]))
+	print('Optimal Score: ' + String(temp[2]))
+	print('Time: ' + String((float(end) - start) / 1000) + ' seconds\n')
 	
 	g.turn = 1 - g.turn
 	

@@ -120,12 +120,13 @@ func nextTurn(i = 9, j = 9):
 		print('Game Over, Black wins!')
 		gameOver = true
 		
-	if not turn:
-		thread.start(self, "AwawEngine", [pieces.duplicate(true), gameRules.duplicate(true), turn])
+#	if not turn:
+#		thread.start(self, "AwawEngine", [pieces.duplicate(true), gameRules.duplicate(true), turn])
 	
-func rays(res, dir, i, j, color, lim = 9, special = -1, t = false, 
+func rays(res, dir, i, j, color, lim = 9, uniquePiece = -1, t = false, 
 			inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):
 	var enPassant = rules[1]
+	var piece = uniquePiece + 6 * (1 - color)
 	
 	for d in dir:
 		if d == 4:
@@ -138,7 +139,7 @@ func rays(res, dir, i, j, color, lim = 9, special = -1, t = false,
 			if n >= lim:
 				break
 			
-			if special == 5 and d in [0, 2, 6, 8] and n == 1:
+			if uniquePiece == 5 and d in [0, 2, 6, 8] and n == 1:
 				break
 				
 			cur += vector
@@ -146,12 +147,9 @@ func rays(res, dir, i, j, color, lim = 9, special = -1, t = false,
 					
 			if not checklimit(cur):
 				break
-#
-#			if not t and special == 0 and total[cur[0]][cur[1]] == 1:
-#				break
-				
+			
 			if getindex(inp, cur) == -1:
-				if special == 5:
+				if uniquePiece == 5:
 					if (not t and d in [0, 2, 6, 8]):
 						if not (cur[0] == enPassant[0] and cur[1] == enPassant[1]):
 							break
@@ -159,18 +157,23 @@ func rays(res, dir, i, j, color, lim = 9, special = -1, t = false,
 					if (t and d in [1, 7]):
 						break
 				
-				res[cur[0]][cur[1]] = 1
+				#Check if move will lead to king check
+				if t or (not t and not willCheck(piece, i, j, cur[0], cur[1], color, inp, rules)):
+					res[cur[0]][cur[1]] = 1
+					
 				continue
 			else:
-				if t and not (special == 5 and d in [1, 7]):
+				if t and not (uniquePiece == 5 and d in [1, 7]):
 					res[cur[0]][cur[1]] = 1
 					break
 					
 				if color != getcolor(inp[cur[0]][cur[1]]):
-					if special == 5 and d in [1, 7]:
+					if uniquePiece == 5 and d in [1, 7]:
 						break
 						
-					res[cur[0]][cur[1]] = 1
+					#Check if move will lead to king check
+					if t or (not t and not willCheck(piece, i, j, cur[0], cur[1], color, inp, rules)):
+						res[cur[0]][cur[1]] = 1
 				break
 	return res
 
@@ -200,10 +203,9 @@ func possibleMoves(piece: int, i: int, j: int, total = false,
 						var x = m + i
 						var y = n + j
 						if checklimit([x,y]):
-							if inp[x][y] == -1:
-								res[x][y] = 1
-							elif color != getcolor(inp[x][y]):
-								res[x][y] = 1
+							if inp[x][y] == -1 or color != getcolor(inp[x][y]):
+								if total or (not total and not willCheck(piece, i, j, x, y, color, inp, rules)):
+									res[x][y] = 1
 		4: #Rook
 			res = rays(res, [1, 3, 5, 7], i, j, color, 9, unique_piece, total, inp, rules)
 		5: #Pawn
@@ -213,10 +215,10 @@ func possibleMoves(piece: int, i: int, j: int, total = false,
 	
 	#Check possible moves if king will be checked
 	if not total:
-		for x in 8:
-			for y in 8:
-				if res[x][y] == 1 and willCheck(piece, i, j, x, y, color, inp, rules):
-					res[x][y] = 0
+#		for x in 8:
+#			for y in 8:
+#				if res[x][y] == 1 and willCheck(piece, i, j, x, y, color, inp, rules):
+#					res[x][y] = 0
 		#Castling
 		if unique_piece == 0:
 			var t = totalCovered(1 - color, inp, rules)
@@ -255,9 +257,7 @@ func canMove(color, inp1 = pieces.duplicate(true), rules1 = gameRules.duplicate(
 						return true
 	return false
 
-#func checkGameOver(color, inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):
-
-		
+#Use piece not unique piece
 func willCheck(piece, i, j, ti, tj, color, inp = pieces.duplicate(true), rules = gameRules.duplicate(true)) -> bool:
 	var temp = move(piece, i, j, ti, tj, inp, true, rules)
 	var tpieces = temp[0]

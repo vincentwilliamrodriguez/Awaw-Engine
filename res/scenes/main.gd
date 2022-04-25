@@ -32,7 +32,8 @@ func _input(event):
 				g.board = g.BOARD.duplicate(true)
 				
 				
-			elif piece != -1 and g.getcolor(piece) == g.turn and g.turn and not g.gameOver:
+#			elif piece != -1 and g.getcolor(piece) == g.turn and g.turn and not g.gameOver:
+			elif piece != -1 and g.getcolor(piece) == g.turn and not g.gameOver:
 				g.sp = piece
 				g.lasti = i
 				g.lastj = j

@@ -28,6 +28,18 @@ window/size/test_height=720
 window/handheld/orientation="portrait"
 window/stretch/shrink=0.28
 
+[editor_plugins]
+
+enabled=PoolStringArray(  )
+
+[gd2cs]
+
+config/ask_no_python=true
+
+[gdnative]
+
+singletons=[  ]
+
 [input]
 
 click={

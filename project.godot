@@ -17,6 +17,7 @@ config/icon="res://icon.png"
 [autoload]
 
 g="*res://global.gd"
+C="*res://Calc.cs"
 
 [display]
 
@@ -27,6 +28,18 @@ window/size/test_width=720
 window/size/test_height=720
 window/handheld/orientation="portrait"
 window/stretch/shrink=0.28
+
+[editor_plugins]
+
+enabled=PoolStringArray(  )
+
+[gd2cs]
+
+config/ask_no_python=true
+
+[gdnative]
+
+singletons=[  ]
 
 [input]
 

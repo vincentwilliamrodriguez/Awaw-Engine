@@ -5,6 +5,8 @@ onready var thread = Thread.new()
 var num: int
 
 func _ready():
+#	print(C.Testing([1,2,3]))
+	print(C.LocateKing(1, [[1,2,3,4,5]]))
 	pass
 
 const BOARD = [
@@ -39,11 +41,9 @@ var lastj = 7
 var lastPossibleMoves = []
 var gameOver = false
 
-#var castlingRules = [[true, true], [true, true]] #[[Black QS, Black KS], [White QS, White KS]]
-#var enPassant = [9, 9] # 1 square behind last pawn moved
 var gameRules = [ [[true, true], [true, true]], #Castling rules
 				[9, 9]] #En Passant
-var turn = 1
+var turn = true
 
 func gen2d(l,w,v = 0):
 	var list = []
@@ -59,7 +59,7 @@ func getindex(inp, index):
 	return inp[index[0]][index[1]]
 
 func getcolor(piece):
-	return 1 - floor(piece / 6)
+	return !bool(floor(piece / 6))
 
 func locateking(color, inp = pieces.duplicate(true)):
 	for i in 8:
@@ -72,7 +72,6 @@ func combine2d(inp1: Array, inp2: Array) -> Array:
 	for i in inp1.size():
 		for j in inp1.size():
 			inp1[i][j] = 1 if inp1[i][j] == 1 or inp2[i][j] == 1 else 0
-			
 	return inp1
 	
 func highlight(i,j):
@@ -109,7 +108,7 @@ func nextTurn(i = 9, j = 9):
 	g.pieces = temp[0]
 	g.gameRules = temp[1]
 		
-	g.turn = 1 - g.turn
+	g.turn = !g.turn
 	
 	var score = g.evaluate()
 	if score == 32000:
@@ -120,12 +119,14 @@ func nextTurn(i = 9, j = 9):
 		print('Game Over, Black wins!')
 		gameOver = true
 		
-	if not turn:
+	if not turn and not gameOver:
 		thread.start(self, "AwawEngine", [pieces.duplicate(true), gameRules.duplicate(true), turn])
-	
-func rays(res, dir, i, j, color, lim = 9, special = -1, t = false, 
+#		AwawEngine([pieces.duplicate(true), gameRules.duplicate(true), turn])
+		
+func rays(res, dir, i, j, color, lim = 9, uniquePiece = -1, t = false, 
 			inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):
 	var enPassant = rules[1]
+	var piece = uniquePiece + 6 * int(!color)
 	
 	for d in dir:
 		if d == 4:
@@ -138,7 +139,7 @@ func rays(res, dir, i, j, color, lim = 9, special = -1, t = false,
 			if n >= lim:
 				break
 			
-			if special == 5 and d in [0, 2, 6, 8] and n == 1:
+			if uniquePiece == 5 and d in [0, 2, 6, 8] and n == 1:
 				break
 				
 			cur += vector
@@ -146,12 +147,9 @@ func rays(res, dir, i, j, color, lim = 9, special = -1, t = false,
 					
 			if not checklimit(cur):
 				break
-#
-#			if not t and special == 0 and total[cur[0]][cur[1]] == 1:
-#				break
-				
+			
 			if getindex(inp, cur) == -1:
-				if special == 5:
+				if uniquePiece == 5:
 					if (not t and d in [0, 2, 6, 8]):
 						if not (cur[0] == enPassant[0] and cur[1] == enPassant[1]):
 							break
@@ -159,18 +157,23 @@ func rays(res, dir, i, j, color, lim = 9, special = -1, t = false,
 					if (t and d in [1, 7]):
 						break
 				
-				res[cur[0]][cur[1]] = 1
+				#Check if move will lead to king check
+				if t or (not t and not willCheck(piece, i, j, cur[0], cur[1], color, inp, rules)):
+					res[cur[0]][cur[1]] = 1
+					
 				continue
 			else:
-				if t and not (special == 5 and d in [1, 7]):
+				if t and not (uniquePiece == 5 and d in [1, 7]):
 					res[cur[0]][cur[1]] = 1
 					break
 					
 				if color != getcolor(inp[cur[0]][cur[1]]):
-					if special == 5 and d in [1, 7]:
+					if uniquePiece == 5 and d in [1, 7]:
 						break
 						
-					res[cur[0]][cur[1]] = 1
+					#Check if move will lead to king check
+					if t or (not t and not willCheck(piece, i, j, cur[0], cur[1], color, inp, rules)):
+						res[cur[0]][cur[1]] = 1
 				break
 	return res
 
@@ -200,10 +203,9 @@ func possibleMoves(piece: int, i: int, j: int, total = false,
 						var x = m + i
 						var y = n + j
 						if checklimit([x,y]):
-							if inp[x][y] == -1:
-								res[x][y] = 1
-							elif color != getcolor(inp[x][y]):
-								res[x][y] = 1
+							if inp[x][y] == -1 or color != getcolor(inp[x][y]):
+								if total or (not total and not willCheck(piece, i, j, x, y, color, inp, rules)):
+									res[x][y] = 1
 		4: #Rook
 			res = rays(res, [1, 3, 5, 7], i, j, color, 9, unique_piece, total, inp, rules)
 		5: #Pawn
@@ -213,18 +215,18 @@ func possibleMoves(piece: int, i: int, j: int, total = false,
 	
 	#Check possible moves if king will be checked
 	if not total:
-		for x in 8:
-			for y in 8:
-				if res[x][y] == 1 and willCheck(piece, i, j, x, y, color, inp, rules):
-					res[x][y] = 0
+#		for x in 8:
+#			for y in 8:
+#				if res[x][y] == 1 and willCheck(piece, i, j, x, y, color, inp, rules):
+#					res[x][y] = 0
 		#Castling
 		if unique_piece == 0:
-			var t = totalCovered(1 - color, inp, rules)
+			var t = totalCovered(!color, inp, rules)
 			var kinglocation = locateking(color)
 			
 			if getindex(t, kinglocation) == 0: #If king is not check
 				for side in 2:
-					if castlingRules[color][side]:
+					if castlingRules[int(color)][side]:
 						var castlingallowed = true
 						for n in [5, 6] if side else [2, 3]: #for y in kingside else queenside
 							if inp[i][n] != -1 or t[i][n] == 1: #if (square is not empty) or check
@@ -255,14 +257,12 @@ func canMove(color, inp1 = pieces.duplicate(true), rules1 = gameRules.duplicate(
 						return true
 	return false
 
-#func checkGameOver(color, inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):
-
-		
+#Use piece not unique piece
 func willCheck(piece, i, j, ti, tj, color, inp = pieces.duplicate(true), rules = gameRules.duplicate(true)) -> bool:
 	var temp = move(piece, i, j, ti, tj, inp, true, rules)
 	var tpieces = temp[0]
 	var trules = temp[1]
-	var total = totalCovered(1 - color, tpieces, trules)
+	var total = totalCovered(!color, tpieces, trules)
 	var kinglocation = locateking(color, tpieces)
 	if getindex(total, kinglocation) == 1:
 		return true
@@ -284,13 +284,13 @@ func move(piece, i, j, ti, tj, inp1 = pieces.duplicate(true), checking = false, 
 	
 	if not checking:
 		if piece in [0, 6]: #If king moved
-			castlingRules[color] = [false, false]
+			castlingRules[int(color)] = [false, false]
 		elif piece in [4, 10]: #If rook moved
 			if j in [0, 7]:
-				castlingRules[color][1 if j == 7 else 0] = false
+				castlingRules[int(color)][1 if j == 7 else 0] = false
 				
 	if piece in [0, 6] and j == 4 and abs(tj - j) == 2:
-		var temp = move(10 - 6 * color, i, 0 if tj == 2 else 7, ti, 3 if tj == 2 else 5, inp, false, rules) #moving rook
+		var temp = move(10 - 6 * int(color), i, 0 if tj == 2 else 7, ti, 3 if tj == 2 else 5, inp, false, rules) #moving rook
 		inp = temp[0]
 		castlingRules = temp[1][0]
 		enPassant = temp[1][1]
@@ -306,7 +306,7 @@ func move(piece, i, j, ti, tj, inp1 = pieces.duplicate(true), checking = false, 
 				enPassant = [ti + (1 if color else -1), tj] #sets en passant
 	
 	#Promotion
-	if piece in [5, 11] and ti == (7 if 1 - color else 0):
+	if piece in [5, 11] and ti == (7 if !color else 0):
 		inp[ti][tj] = 1 if color else 7
 		
 	return [inp, [castlingRules, enPassant]]
@@ -317,14 +317,21 @@ func AwawEngine(inputs: Array):
 	var rules = inputs[1].duplicate(true)
 	var color = inputs[2]
 	
+	var start = OS.get_ticks_msec()
+	
 	print('Thinking')
+	
 	var temp = miniMax(inp, rules, color, 2)
 	pieces = temp[0]
 	gameRules = temp[1]
-	print('Done ' + String(num))
-	print('Optimal Score: '+String(temp[2]))
 	
-	g.turn = 1 - g.turn
+	var end = OS.get_ticks_msec()
+	
+	print('Done ' + String(num))
+	print('Optimal Score: ' + String(temp[2]))
+	print('Time: ' + String((float(end) - start) / 1000) + ' seconds\n')
+	
+	g.turn = !g.turn
 	
 	call_deferred("AwawEngineDone")
 	
@@ -346,7 +353,7 @@ func miniMax(inp1, rules1, color, depth, alpha = -INF, beta = INF):
 	var optimalRules: Array
 	
 	if depth == 0 or score == 32000 or score == -32000:
-		return [inp, rules, score - (depth * (2 * color - 1))]
+		return [inp, rules, score - (depth * (1 if color else -1))]
 	
 	
 	for i in 8:
@@ -362,7 +369,7 @@ func miniMax(inp1, rules1, color, depth, alpha = -INF, beta = INF):
 							var childPos = temp[0]
 							var childRules = temp[1]
 							
-							var childMiniMax = miniMax(childPos, childRules, 1 - color, depth - 1, alpha, beta)
+							var childMiniMax = miniMax(childPos, childRules, !color, depth - 1, alpha, beta)
 							var childScore = childMiniMax[2]
 							
 							if childPos[4][7] == 7:
@@ -389,13 +396,13 @@ func evaluate(inp1 = pieces, rules1 = gameRules):
 	var inp = inp1.duplicate(true)
 	var rules = rules1.duplicate(true)
 	
-	var materialValue: int
+	var materialValue = 0
 	
-	for color in 2:
+	for color in [true, false]:
 		if not canMove(color, inp, rules):
 			var kingpos = locateking(color, inp)
-			if getindex(totalCovered(1 - color, inp, rules), kingpos):
-				if 1 - color:
+			if getindex(totalCovered(!color, inp, rules), kingpos):
+				if !color:
 					return 32000
 				else:
 					return -32000
@@ -407,5 +414,5 @@ func evaluate(inp1 = pieces, rules1 = gameRules):
 			var piece = inp[i][j]
 			if piece != -1:
 				var color = getcolor(piece)
-				materialValue += PIECESVALUES[getUniquePiece(piece)] * (2 * color - 1) # Add white pieces value, subtract black pieces value
+				materialValue += PIECESVALUES[getUniquePiece(piece)] * (1 if color else -1) # Add white pieces value, subtract black pieces value
 	return materialValue

@@ -1,0 +1,14 @@
+{
+	"folders": [
+		{
+			"path": "..\\..\\..\\Desktop\\processing projects"
+		},
+		{
+			"path": "..\\..\\..\\Desktop\\Pocket Ants translation"
+		}
+	],
+	"settings": {
+		"code-runner.customCommand": "java -jar processing-py.jar Diobenu/hive.py",
+		"git.ignoreLimitWarning": true
+	}
+}

@@ -5,7 +5,7 @@ onready var thread = Thread.new()
 var num: int
 
 func _ready():
-	print(C.Testing([1,2,3]))
+#	print(C.Testing([1,2,3]))
 	print(C.LocateKing(1, [[1,2,3,4,5]]))
 	pass
 

@@ -28,8 +28,7 @@ public class Calc : Node
         return new int[] {9, 9};
     }
 
-    public int Testing(int[] inp){
-        GD.Print(inp[1]);
-        return 1;
+    public void Testing(int[,] inp){
+        GD.Print("test ", inp[0,1]);
     }
 }

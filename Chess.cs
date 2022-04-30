@@ -56,40 +56,47 @@ public class Chess: Node
 		
 		var piece = Res.Pieces[i, j];
 		var color = GetColor(piece);
+		int colorVal = Convert.ToInt16(color);
 		
 		Res.Pieces[i, j] = -1;
 		Res.Pieces[ti, tj] = piece;
 		
-		// #Castling
+		// Castling
+		if (!checking){
+			if (piece == 0 || piece == 6){ //If king moved
+				for(int side = 0; j < 2; j++){
+					Res.CastlingRules[colorVal, side] = 0;
+				}
+			}
+			else if (piece == 4 || piece == 10){ //If rook moved
+				Res.CastlingRules[colorVal, Convert.ToInt16(j == 7)] = 0;
+			}
+		}
+
+		//Check if the move is Castling
+		if ((piece == 0 || piece == 6) && j == 4 && Math.Abs(tj - j) == 2){
+			Res = Res.Move(i, tj == 2 ? 0:7, ti, tj == 2 ? 3:5, false); //Moving Rook
+		}
+
+		// En Passant
+		if ((piece == 5 || piece == 11) && tj == EnPassant[1]){
+			Res.Pieces[ti + (color ? 1:-1), tj] = -1; //Captures Pawn
+		}
+
+		//Updates En Passant
+		if (!checking){
+			Res.EnPassant = new int[] {9, 9}; //Resets en passant
+			//Check if elligible for En Passant
+			if ((piece == 5 || piece == 11) && Math.Abs(ti - i) == 2){
+				Res.EnPassant = new int[] {ti + (color ? 1:-1), tj};
+			}
+		}
+
+		//Promotion
+		if ((piece == 5 || piece == 11) && ti == (!color ? 7:0)){
+			Res.Pieces[ti, tj] = color ? 1:7;
+		}
 		
-		// if not checking:
-		// 	if piece in [0, 6]: #If king moved
-		// 		castlingRules[int(color)] = [false, false]
-		// 	elif piece in [4, 10]: #If rook moved
-		// 		if j in [0, 7]:
-		// 			castlingRules[int(color)][1 if j == 7 else 0] = false
-					
-		// if piece in [0, 6] and j == 4 and abs(tj - j) == 2:
-		// 	var temp = move(10 - 6 * int(color), i, 0 if tj == 2 else 7, ti, 3 if tj == 2 else 5, inp, false, rules) #moving rook
-		// 	inp = temp[0]
-		// 	castlingRules = temp[1][0]
-		// 	enPassant = temp[1][1]
-		
-		// #En Passant
-		// if piece in [5, 11] and [ti, tj] == enPassant:
-		// 	inp[ti + (1 if color else -1)][tj] = -1 #captures pawn
-			
-		// if not checking:
-		// 	enPassant = [9, 9] #resets en passant
-		// 	if piece in [5, 11]:
-		// 		if abs(ti - i) == 2:
-		// 			enPassant = [ti + (1 if color else -1), tj] #sets en passant
-		
-		// #Promotion
-		// if piece in [5, 11] and ti == (7 if !color else 0):
-		// 	inp[ti][tj] = 1 if color else 7
-			
-		// return [inp, [castlingRules, enPassant]]}
 		return Res;
 	}
 }

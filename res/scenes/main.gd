@@ -21,7 +21,7 @@ func _input(event):
 		var i = index[1]
 		var j = index[0]
 		if g.checklimit(index):
-			var piece = g.pieces[i][j]
+			var piece = g.MainChess.Pieces[8 * i + j]
 			
 			if g.selected:
 				if g.lastPossibleMoves[i][j] == 1:
@@ -38,7 +38,9 @@ func _input(event):
 				g.sp = piece
 				g.lasti = i
 				g.lastj = j
-				g.lastPossibleMoves = g.possibleMoves(piece,i,j)
+				
+				var temp = g.convertCS(g.MainChess)
+				g.lastPossibleMoves = g.possibleMoves(piece,i,j,false,temp[0],temp[1])
 				
 				g.highlightBoard(g.lastPossibleMoves)
 				g.selected = true

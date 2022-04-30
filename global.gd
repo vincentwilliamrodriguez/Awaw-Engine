@@ -121,7 +121,21 @@ func nextTurn(i = 9, j = 9):
 	if not turn and not gameOver:
 		thread.start(self, "AwawEngine", [MainChess, turn])
 #		AwawEngine([MainChess, turn])
-		
+
+func convertCS(Ch):
+	var inp = gen2d(8, 8)
+	var rules = [gen2d(2, 2), Array(Ch.EnPassant)]
+	
+	for i in 8:
+		for j in 8:
+			inp[i][j] = Ch.Pieces[8 * i + j]
+	
+	for i in 2:
+		for j in 2:
+			rules[0][i][j] = Ch.CastlingRules[2 * i + j]
+	
+	return [inp, rules]
+			
 func rays(res, dir, i, j, color, lim = 9, uniquePiece = -1, t = false, 
 			inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):
 	var enPassant = rules[1]
@@ -313,19 +327,10 @@ func move(piece, i, j, ti, tj, inp1 = pieces.duplicate(true), checking = false, 
 #========== Awaw Engine ===========
 func AwawEngine(inputs: Array):
 	var Ch = inputs[0]
-	var inp = gen2d(8, 8)
-	var rules = [gen2d(2, 2), Array(Ch.EnPassant)]
+	var temp1 = convertCS(Ch)
 	
-	for i in 8:
-		for j in 8:
-			inp[i][j] = Ch.Pieces[8 * i + j]
-	
-	for i in 2:
-		for j in 2:
-			rules[0][i][j] = Ch.CastlingRules[2 * i + j]
-	
-	inp = inp.duplicate(true)
-	rules = rules.duplicate(true)
+	var inp = temp1[0].duplicate(true)
+	var rules = temp1[1].duplicate(true)
 	var color = inputs[1]
 	
 	var start = OS.get_ticks_msec()
@@ -383,10 +388,7 @@ func miniMax(inp1, rules1, color, depth, alpha = -INF, beta = INF):
 							
 							var childMiniMax = miniMax(childPos, childRules, !color, depth - 1, alpha, beta)
 							var childScore = childMiniMax[2]
-							
-							if childPos[4][7] == 7:
-								prints(childScore, inp, childPos, color, depth, alpha, beta)
-							
+		
 							if (childScore > optimalScore) if color else (childScore < optimalScore):
 								optimalPos = childPos.duplicate(true)
 								optimalRules = childRules.duplicate(true)

@@ -4,9 +4,13 @@ signal engineNext
 onready var thread = Thread.new()
 var num: int
 
+onready var ChessClass = preload("res://Chess.cs")
+onready var Ch = ChessClass.new().Init2(pieces, gameRules[0], gameRules[1])
+
 func _ready():
-	print(C.ToCS(PIECES))
-#	print(C.LocateKing(true, C.ToCS(PIECES)))
+	print("Chess Pieces ", Ch.Pieces)
+	print("White King Location: ", Ch.LocateKing(1))
+#	print(C.Test())
 	pass
 
 const BOARD = [

@@ -11,15 +11,10 @@ public class Calc : Node
         // GD.Print(test[0], ' ', test[1]);    
     } 
 
-    public static int[,] ToCS(Godot.Collections.Array<Godot.Collections.Array<int>> inp){
-        var res = new int[8, 8];
-        GD.Print(res);
-        for(int i = 0; i < 8; i++){
-            for(int j = 0; j < 8; j++){
-                res[i, j] = inp[i][j];
-            }
-        }
-        return res;
+    public int[,] Test(){
+        var test = new int[8,8];
+        GD.Print(test);
+        return test;
     }
     public static int[] LocateKing(bool color, int[,] inp){
         for (int i = 0; i < 8; i++){

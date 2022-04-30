@@ -19,7 +19,7 @@ config/icon="res://icon.png"
 g="*res://global.gd"
 C="*res://Calc.cs"
 foo="*res://foo.gd"
-Bar="*res://Bar.cs"
+Bar="res://Bar.cs"
 
 [display]
 

@@ -5,8 +5,8 @@ onready var thread = Thread.new()
 var num: int
 
 func _ready():
-#	print(C.Testing([[1,2,3]]))
-#	print(C.LocateKing(1, [[1,2,3,4,5]]))
+	print(C.ToCS(PIECES))
+#	print(C.LocateKing(true, C.ToCS(PIECES)))
 	pass
 
 const BOARD = [

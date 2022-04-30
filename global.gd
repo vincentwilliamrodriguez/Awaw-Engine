@@ -10,6 +10,8 @@ onready var Ch = ChessClass.new().Init2(pieces, gameRules[0], gameRules[1])
 func _ready():
 	print("Chess Pieces ", Ch.Pieces)
 	print("White King Location: ", Ch.LocateKing(1))
+	print("Moving: ", Ch.Move(6, 4, 4, 4, false))
+	print(Ch.Pieces)
 #	print(C.Test())
 	pass
 

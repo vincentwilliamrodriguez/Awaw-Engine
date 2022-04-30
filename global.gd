@@ -5,14 +5,9 @@ onready var thread = Thread.new()
 var num: int
 
 onready var ChessClass = preload("res://Chess.cs")
-onready var Ch = ChessClass.new().Init2(pieces, gameRules[0], gameRules[1])
+onready var MainChess = ChessClass.new().Init2(pieces, gameRules[0], gameRules[1])
 
 func _ready():
-	print("Chess Pieces ", Ch.Pieces)
-	print("White King Location: ", Ch.LocateKing(1))
-	print("Moving: ", Ch.Move(6, 4, 4, 4, false))
-	print(Ch.Pieces)
-#	print(C.Test())
 	pass
 
 const BOARD = [
@@ -47,7 +42,7 @@ var lastj = 7
 var lastPossibleMoves = []
 var gameOver = false
 
-var gameRules = [ [[true, true], [true, true]], #Castling rules
+var gameRules = [ [[1, 1], [1, 1]], #Castling rules
 				[9, 9]] #En Passant
 var turn = true
 
@@ -110,10 +105,8 @@ func getUniquePiece(piece):
 	return piece - 6 if piece > 5 else piece
 	
 func nextTurn(i = 9, j = 9):
-	var temp = g.move(g.sp, g.lasti, g.lastj, i, j)
-	g.pieces = temp[0]
-	g.gameRules = temp[1]
-		
+	MainChess = MainChess.Move(lasti, lastj, i, j, false)
+	
 	g.turn = !g.turn
 	
 	var score = g.evaluate()
@@ -126,8 +119,8 @@ func nextTurn(i = 9, j = 9):
 		gameOver = true
 		
 	if not turn and not gameOver:
-		thread.start(self, "AwawEngine", [pieces.duplicate(true), gameRules.duplicate(true), turn])
-#		AwawEngine([pieces.duplicate(true), gameRules.duplicate(true), turn])
+		thread.start(self, "AwawEngine", [MainChess, turn])
+#		AwawEngine([MainChess, turn])
 		
 func rays(res, dir, i, j, color, lim = 9, uniquePiece = -1, t = false, 
 			inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):
@@ -319,17 +312,30 @@ func move(piece, i, j, ti, tj, inp1 = pieces.duplicate(true), checking = false, 
 
 #========== Awaw Engine ===========
 func AwawEngine(inputs: Array):
-	var inp = inputs[0].duplicate(true)
-	var rules = inputs[1].duplicate(true)
-	var color = inputs[2]
+	var Ch = inputs[0]
+	var inp = gen2d(8, 8)
+	var rules = [gen2d(2, 2), Array(Ch.EnPassant)]
+	
+	for i in 8:
+		for j in 8:
+			inp[i][j] = Ch.Pieces[8 * i + j]
+	
+	for i in 2:
+		for j in 2:
+			rules[0][i][j] = Ch.CastlingRules[2 * i + j]
+	
+	inp = inp.duplicate(true)
+	rules = rules.duplicate(true)
+	var color = inputs[1]
 	
 	var start = OS.get_ticks_msec()
 	
 	print('Thinking')
 	
 	var temp = miniMax(inp, rules, color, 2)
-	pieces = temp[0]
-	gameRules = temp[1]
+#	pieces = temp[0]
+#	gameRules = temp[1]
+	MainChess = ChessClass.new().Init2(temp[0], temp[1][0], temp[1][1])
 	
 	var end = OS.get_ticks_msec()
 	

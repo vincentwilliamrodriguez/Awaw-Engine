@@ -11,7 +11,8 @@ func update():
 	for i in 8:
 		for j in 8:
 			b.set_cell(j,i,g.board[i][j])
-			p.set_cell(j,i,g.pieces[i][j])
+			p.set_cell(j,i,g.MainChess.Pieces[i * 8 + j])
+			
 
 func _input(event):
 	if event.is_action_released("click"):

@@ -4,18 +4,18 @@ using System;
 public class Chess: Node
 {
     int[,] Pieces;
-	bool[,] CastlingRules;
+	int[,] CastlingRules;
 	int[] EnPassant;
 
-	public Chess Init(int[,] pieces, bool[,] castlingrules, int[] enpassant){
+	public Chess Init(int[,] pieces, int[,] castlingrules, int[] enpassant){
 		Pieces = (int[,]) pieces.Clone();
-		CastlingRules = (bool[,]) castlingrules.Clone();
+		CastlingRules = (int[,]) castlingrules.Clone();
 		EnPassant = (int[]) enpassant.Clone();
 		return this;
 	}
 
 	public Chess Init2(Godot.Collections.Array<Godot.Collections.Array<int>> pieces,
-						Godot.Collections.Array<Godot.Collections.Array<bool>> castlingrules,
+						Godot.Collections.Array<Godot.Collections.Array<int>> castlingrules,
 						int[] enpassant){
 		return Init(ToCS(pieces), ToCS(castlingrules), enpassant);
 	}

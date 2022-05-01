@@ -12,6 +12,9 @@ func _ready():
 	MainChess.TotalCovered(true)
 	pass
 
+func test(inp):
+	print(inp)
+
 const BOARD = [
 [3,1,3,1,3,1,3,1],
 [1,3,1,3,1,3,1,3],

@@ -19,13 +19,10 @@ public class Chess: Node
 	Godot.Object g;
 	int[] range9;
 
-	public override void _Ready(){
-    	range9 = Enumerable.Range(0, 9).ToArray();
-	}
-
 	public Chess Init(int[,] pieces, int[,] castlingrules, int[] enpassant){
 		global = (GDScript) GD.Load("res://global.gd");
 		g = (Godot.Object) global.New();
+		range9 = Enumerable.Range(0, 9).ToArray();
 
 		Pieces = (int[,]) pieces.Clone();
 		CastlingRules = (int[,]) castlingrules.Clone();
@@ -64,20 +61,20 @@ public class Chess: Node
         return new int[] {9, 9};
     }
 
-	private bool GetColor(int piece){
+	private static bool GetColor(int piece){
 		return !Convert.ToBoolean(piece / 6);
 	}
 
-	private int GetUniquePiece(int piece){
+	private static int GetUniquePiece(int piece){
 		return piece > 5  ?  piece - 6:piece;
 	}
 
-	private bool CheckLimit(int[] index){
+	private static bool CheckLimit(int[] index){
 		return index[0] >= 0 && index[0] <= 7 && index[1] >= 0 && index[1] <= 7;
 	}
 
-	private bool CheckLimit(int i, int j){
-		return i >= 0 && i <= 7 && i >= 0 && i <= 7;
+	private static bool CheckLimit(int i, int j){
+		return i >= 0 && i <= 7 && j >= 0 && j <= 7;
 	}
 
 	
@@ -258,6 +255,9 @@ public class Chess: Node
 				}
 			}
 		}
+		var test = new int[64];
+		Res.CopyTo(test, 0);
+		g.Call("test", test);
 		return Res;
 	}
 

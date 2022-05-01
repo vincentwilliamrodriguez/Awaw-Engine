@@ -3,6 +3,13 @@ using System;
 using System.Collections;
 using System.Linq;
 
+public static class Extension
+{
+	public static bool In<T>(this T obj, params T[] args){
+		return args.Contains(obj);
+	}
+}
+
 public class Chess: Node
 {
     int[,] Pieces;
@@ -73,6 +80,8 @@ public class Chess: Node
 		return i >= 0 && i <= 7 && i >= 0 && i <= 7;
 	}
 
+	
+
 	public void Testing(){
 		GD.Print(g.Call("totalCovered", true, g.Get("pieces"), g.Get("gameRules")));
 
@@ -87,6 +96,75 @@ public class Chess: Node
 	// rays' 9th and 10th paramater removed
 	public BitArray rays(BitArray Res, int[] dir, int i, int j, bool color, 
 							int lim, int uniquePiece, bool t){
+		var piece = uniquePiece + 6 * Convert.ToInt16(!color);
+		
+		foreach (int d in dir){
+			if (d == 4){
+				continue;
+			}
+			var cur = new int[] {i,j};
+
+			var r = d / 3 - 1;
+			var c = (d % 3) - 1;
+			var direction = new int[] {r, c};
+			var n = 0;
+			
+			while (true){
+				if (n >= lim){
+					break;
+				}
+
+				if (uniquePiece == 5 && Extension.In(d, 0, 2, 6, 8) && n == 1){
+					break;
+				}
+
+				cur.Zip(direction, (x, y) => x + y);
+				n += 1;
+						
+				if (!CheckLimit(cur)){
+					break;
+				}
+
+				if (Pieces[cur[0], cur[1]] == -1){ //If square is empty
+					if (uniquePiece == 5){
+						if (!t && Extension.In(d, 0, 2, 6, 8)){
+							if (!(cur[0] == EnPassant[0] && cur[1] == EnPassant[1])){
+								break;
+							}
+						}
+						if (t && Extension.In(d, 1, 7)){
+							break;
+						}
+					}
+
+					//Check if move will lead to king check
+					if (t || (!t && !WillCheck(piece, i, j, cur[0], cur[1], color))){
+						Res[8 * cur[0] + cur[1]] = true;
+					}
+						
+					continue;
+				}
+
+				else{ // Square has piece
+					// Check if total and not (Piece is pawn and d is forward)
+					if (t && !(uniquePiece == 5 && Extension.In(d, 1, 7))){
+						Res[8 * cur[0] + cur[1]] = true;
+						break;
+					}
+					if (color != GetColor(Pieces[cur[0], cur[1]])){ // If piece is opposite color
+						if (uniquePiece == 5 && Extension.In(d, 1, 7)){
+							break;
+						}
+
+						//Check if move will lead to king check
+						if (t || (!t && !WillCheck(piece, i, j, cur[0], cur[1], color))){
+							Res[8 * cur[0] + cur[1]] = true;
+						}
+					}
+					break;
+				}
+			}
+		}
 		return Res;
 	}
 
@@ -185,7 +263,11 @@ public class Chess: Node
 
 	// WillCheck's 7th and 8th parameter removed
 	public bool WillCheck(int piece, int i, int j, int ti, int tj, bool color){
-		return true;
+		Chess NextPos = Move(i, j, ti, tj, true);
+
+		var total = NextPos.TotalCovered(!color);
+		var k = NextPos.LocateKing(color); //king location
+		return total[8 * k[0] + k[1]] == true;
 	}
 
 	// Move's 1st, 6th, 8th parameter removed

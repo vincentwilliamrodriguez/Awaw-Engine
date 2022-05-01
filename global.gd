@@ -194,18 +194,10 @@ func rays(res, dir, i, j, color, lim = 9, uniquePiece = -1, t = false,
 
 #Possible moves of piece as array
 func possibleMoves(piece: int, i: int, j: int, total = false, 
-					inp1 = pieces.duplicate(true), rules1 = gameRules.duplicate(true),
-					Ch = -1):
-	var inp
-	var rules
-	
-	if typeof(Ch) == TYPE_OBJECT:
-		var temp = convertCS(Ch)
-		inp = temp[0]
-		rules = temp[1]
-	else:
-		inp = inp1.duplicate(true)
-		rules = rules1.duplicate(true)
+					inp1 = pieces.duplicate(true), rules1 = gameRules.duplicate(true)):
+
+	var inp = inp1.duplicate(true)
+	var rules = rules1.duplicate(true)
 	
 	var castlingRules = rules[0]
 	
@@ -239,10 +231,6 @@ func possibleMoves(piece: int, i: int, j: int, total = false,
 	
 	#Check possible moves if king will be checked
 	if not total:
-#		for x in 8:
-#			for y in 8:
-#				if res[x][y] == 1 and willCheck(piece, i, j, x, y, color, inp, rules):
-#					res[x][y] = 0
 		#Castling
 		if unique_piece == 0:
 			var t = totalCovered(!color, inp, rules)
@@ -259,8 +247,6 @@ func possibleMoves(piece: int, i: int, j: int, total = false,
 						
 						if castlingallowed:
 							res[i][j + (2 if side else -2)] = 1
-	
-	cs = res.duplicate(true)
 	return res
 
 func totalCovered(color, inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):

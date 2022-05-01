@@ -1,13 +1,23 @@
 using Godot;
 using System;
+using System.Collections;
 
 public class Chess: Node
 {
     int[,] Pieces;
 	int[,] CastlingRules;
 	int[] EnPassant;
+	GDScript global;
+	Godot.Object g;
+
+	public override void _Ready(){
+    	
+	}
 
 	public Chess Init(int[,] pieces, int[,] castlingrules, int[] enpassant){
+		global = (GDScript) GD.Load("res://global.gd");
+		g = (Godot.Object) global.New();
+
 		Pieces = (int[,]) pieces.Clone();
 		CastlingRules = (int[,]) castlingrules.Clone();
 		EnPassant = (int[]) enpassant.Clone();
@@ -47,6 +57,51 @@ public class Chess: Node
 
 	private bool GetColor(int piece){
 		return !Convert.ToBoolean(piece / 6);
+	}
+
+	public void Testing(){
+		GD.Print(g.Call("totalCovered", true, g.Get("pieces"), g.Get("gameRules")));
+
+		var Bits = new BitArray(64);
+		GD.Print(Bits);
+
+		var t = new int[64];
+		Bits.CopyTo(t, 0);
+		// g.Call("Test", t);
+	}
+
+	// rays' 9th and 10th paramater removed
+	public BitArray rays(BitArray Res, int[] dir, int i, int j, bool color, 
+							int lim, int uniquePiece, bool t){
+		return Res;
+	}
+
+	// PossibleMoves' 5th and 6th parameter removed
+	public BitArray PossibleMoves(int piece, int i, int j, bool total){
+		var Res = new BitArray(64);
+		return Res;
+	}
+
+	// TotalCovered's 2nd and 3rd parameter removed
+	public BitArray TotalCovered(bool color){
+		var Res = new BitArray(64);
+
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				var Piece = Pieces[i, j];
+
+				if (Piece != -1  &&  GetColor(Piece) == color){
+					var PieceMoves = PossibleMoves(Piece, i, j, true);
+					Res.Or(PieceMoves);
+				}
+			}
+		}
+		return Res;
+	}
+
+	// WillCheck's 7th and 8th parameter removed
+	public bool WillCheck(int piece, int i, int j, int ti, int tj, bool color){
+		return true;
 	}
 
 	// Move's 1st, 6th, 8th parameter removed

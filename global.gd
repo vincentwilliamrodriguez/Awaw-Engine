@@ -3,11 +3,13 @@ extends Node
 signal engineNext
 onready var thread = Thread.new()
 var num: int
+var cs
 
 onready var ChessClass = preload("res://Chess.cs")
 onready var MainChess = ChessClass.new().Init2(pieces, gameRules[0], gameRules[1])
 
 func _ready():
+	MainChess.TotalCovered(true)
 	pass
 
 const BOARD = [
@@ -123,19 +125,19 @@ func nextTurn(i = 9, j = 9):
 #		AwawEngine([MainChess, turn])
 
 func convertCS(Ch):
-	var inp = gen2d(8, 8)
-	var rules = [gen2d(2, 2), Array(Ch.EnPassant)]
-	
-	for i in 8:
-		for j in 8:
-			inp[i][j] = Ch.Pieces[8 * i + j]
-	
-	for i in 2:
-		for j in 2:
-			rules[0][i][j] = Ch.CastlingRules[2 * i + j]
+	var inp = ToGD(Ch.Pieces, 8, 8)
+	var rules = [ToGD(Ch.CastlingRules, 2, 2), Array(Ch.EnPassant)]
 	
 	return [inp, rules]
-			
+
+func ToGD(inp, r, c):
+	var res = gen2d(8, 8)
+	
+	for i in r:
+		for j in c:
+			res[i][j] = inp[r * i + j]
+	return res
+
 func rays(res, dir, i, j, color, lim = 9, uniquePiece = -1, t = false, 
 			inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):
 	var enPassant = rules[1]
@@ -192,9 +194,18 @@ func rays(res, dir, i, j, color, lim = 9, uniquePiece = -1, t = false,
 
 #Possible moves of piece as array
 func possibleMoves(piece: int, i: int, j: int, total = false, 
-					inp1 = pieces.duplicate(true), rules1 = gameRules.duplicate(true)) -> Array:
-	var inp = inp1.duplicate(true)
-	var rules = rules1.duplicate(true)
+					inp1 = pieces.duplicate(true), rules1 = gameRules.duplicate(true),
+					Ch = -1):
+	var inp
+	var rules
+	
+	if typeof(Ch) == TYPE_OBJECT:
+		var temp = convertCS(Ch)
+		inp = temp[0]
+		rules = temp[1]
+	else:
+		inp = inp1.duplicate(true)
+		rules = rules1.duplicate(true)
 	
 	var castlingRules = rules[0]
 	
@@ -248,6 +259,8 @@ func possibleMoves(piece: int, i: int, j: int, total = false,
 						
 						if castlingallowed:
 							res[i][j + (2 if side else -2)] = 1
+	
+	cs = res.duplicate(true)
 	return res
 
 func totalCovered(color, inp = pieces.duplicate(true), rules = gameRules.duplicate(true)):
@@ -349,6 +362,7 @@ func AwawEngine(inputs: Array):
 	print('Time: ' + String((float(end) - start) / 1000) + ' seconds\n')
 	
 	g.turn = !g.turn
+	num = 0
 	
 	call_deferred("AwawEngineDone")
 	

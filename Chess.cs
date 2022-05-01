@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections;
+using System.Linq;
 
 public class Chess: Node
 {
@@ -9,9 +10,10 @@ public class Chess: Node
 	int[] EnPassant;
 	GDScript global;
 	Godot.Object g;
+	int[] range9;
 
 	public override void _Ready(){
-    	
+    	range9 = Enumerable.Range(0, 9).ToArray();
 	}
 
 	public Chess Init(int[,] pieces, int[,] castlingrules, int[] enpassant){
@@ -59,6 +61,18 @@ public class Chess: Node
 		return !Convert.ToBoolean(piece / 6);
 	}
 
+	private int GetUniquePiece(int piece){
+		return piece > 5  ?  piece - 6:piece;
+	}
+
+	private bool CheckLimit(int[] index){
+		return index[0] >= 0 && index[0] <= 7 && index[1] >= 0 && index[1] <= 7;
+	}
+
+	private bool CheckLimit(int i, int j){
+		return i >= 0 && i <= 7 && i >= 0 && i <= 7;
+	}
+
 	public void Testing(){
 		GD.Print(g.Call("totalCovered", true, g.Get("pieces"), g.Get("gameRules")));
 
@@ -79,6 +93,76 @@ public class Chess: Node
 	// PossibleMoves' 5th and 6th parameter removed
 	public BitArray PossibleMoves(int piece, int i, int j, bool total){
 		var Res = new BitArray(64);
+
+		var unique_piece = GetUniquePiece(piece);
+		var color = GetColor(piece);
+		
+		switch (unique_piece){
+			case 0: //King
+				Res = rays(Res, range9, i, j, color, 1, unique_piece, total);
+				break;
+			
+			case 1: //Queen
+				Res = rays(Res, range9, i, j, color, 9, unique_piece, total);
+				break;
+			
+			case 2: //Bishop
+				Res = rays(Res, new int[] {0, 2, 6, 8}, i, j, color, 9, unique_piece, total);
+				break;
+			
+			case 3: //Knight
+				foreach (int m in (Enumerable.Range(-2, 5).ToArray())){ //range from -2 to 2
+					foreach (int n in (Enumerable.Range(-2, 5).ToArray())){
+						if (m * n != 0 && Math.Abs(m) != Math.Abs(n)){
+							var x = m + i;
+							var y = n + j;
+							if (CheckLimit(x, y)){
+								if (Pieces[x, y] == -1 || color != GetColor(Pieces[x, y])){
+									if (total || (!total && !WillCheck(piece, i, j, x, y, color))){
+										Res[8 * x + y] = true;
+									}
+								}
+							}
+						}
+					}
+				}
+				break;
+			
+			case 4: //Rook
+				Res = rays(Res, new int[] {1, 3, 5, 7}, i, j, color, 9, unique_piece, total);
+				break;
+			
+			case 5: //Pawn
+				var front = color  ?  new int[] {0, 1, 2}:new int[] {6, 7, 8};
+				
+				Res = rays(Res, front, i, j, color, (i == 1 || i == 6) ? 2:1, unique_piece, total);
+				break;
+		}
+		
+		if (!total){
+			//Castling
+			if (unique_piece == 0){
+				var t = TotalCovered(!color);
+				var kinglocation = LocateKing(color);
+				
+				if (!t[8 * kinglocation[0] + kinglocation[1]]){ //If king is not check
+					for(int side = 0; side < 2; side ++){
+						if (Convert.ToBoolean(CastlingRules[Convert.ToInt16(color), side])){
+							var castlingallowed = true;
+							foreach (int n in Convert.ToBoolean(side) ? new int[] {5, 6}:new int[] {2, 3}){ //for y in kingside else queenside
+								if (Pieces[i, n] != -1 || t[8 * i + n]){ //if (square is not empty) or check
+									castlingallowed = false;
+									break;
+								}
+							}
+							if (castlingallowed){
+								Res[8 * i + j + (Convert.ToBoolean(side) ? 2:-2)] = true;
+							}
+						}
+					}
+				}
+			}
+		}
 		return Res;
 	}
 

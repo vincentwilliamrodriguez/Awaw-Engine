@@ -109,7 +109,7 @@ func nextTurn(i = 9, j = 9):
 	
 	g.turn = !g.turn
 	
-	var score = g.evaluate()
+	var score = MainChess.Evaluate()
 	if score == 32000:
 		print('Game Over, White wins!')
 		gameOver = true
@@ -334,13 +334,16 @@ func AwawEngine(inputs: Array):
 	
 	print('Thinking')
 	
-	var temp = miniMax(inp, rules, color, 2)
-	MainChess = CC.new().Init2(temp[0], temp[1][0], temp[1][1])
+#	var temp = miniMax(inp, rules, color, 3)
+#	MainChess = CC.new().Init2(temp[0], temp[1][0], temp[1][1])
+	
+	var Res = MainChess.MiniMax(color, 3, -2147483648, 2147483647)
+	MainChess = Res
 	
 	var end = OS.get_ticks_msec()
 	
 	print('Done ' + String(num))
-	print('Optimal Score: ' + String(temp[2]))
+	print('Optimal Score: ' + String(MainChess.optimalScore))
 	print('Time: ' + String((float(end) - start) / 1000) + ' seconds\n')
 	
 	g.turn = !g.turn
@@ -361,7 +364,7 @@ func miniMax(inp1, rules1, color, depth, alpha = -INF, beta = INF):
 	var rules = rules1.duplicate(true)
 	var Ch = CC.new().Init2(inp, rules[0], rules[1])
 	
-	var score = evaluate(inp, rules)
+	var score = Ch.Evaluate()
 	var optimalScore = -INF if color else INF
 	var optimalPos: Array
 	var optimalRules: Array
@@ -384,9 +387,6 @@ func miniMax(inp1, rules1, color, depth, alpha = -INF, beta = INF):
 	
 							var childPos = temp[0]
 							var childRules = temp[1]
-#							var temp = move(piece, i, j, m, n, inp, false, rules)
-#							var childPos = temp[0]
-#							var childRules = temp[1]
 							
 							var childMiniMax = miniMax(childPos, childRules, !color, depth - 1, alpha, beta)
 							var childScore = childMiniMax[2]

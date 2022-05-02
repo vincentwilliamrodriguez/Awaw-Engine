@@ -10,18 +10,20 @@ public static class Extension
 	}
 }
 
+static class Constants
+{
+	public static readonly int[] PIECESVALUES = new int[] {400, 900, 300, 300, 500, 100};
+}
+
 public class Chess: Node
 {
     int[,] Pieces;
 	int[,] CastlingRules;
 	int[] EnPassant;
-	GDScript global;
-	Godot.Object g;
 	int[] range9;
+	int optimalScore;
 
 	public Chess Init(int[,] pieces, int[,] castlingrules, int[] enpassant){
-		global = (GDScript) GD.Load("res://global.gd");
-		g = (Godot.Object) global.New();
 		range9 = Enumerable.Range(0, 9).ToArray();
 
 		Pieces = (int[,]) pieces.Clone();
@@ -262,9 +264,6 @@ public class Chess: Node
 				}
 			}
 		}
-		var test = new int[64];
-		Res.CopyTo(test, 0);
-		g.Call("test", test);
 		return Res;
 	}
 
@@ -343,5 +342,96 @@ public class Chess: Node
 		}
 		
 		return Res;
+	}
+
+	//Minimax' 1st and 2nd parameters removed
+	public Chess MiniMax(bool color, int depth, 
+		int alpha = int.MinValue, int beta = int.MaxValue){		
+
+		Chess optimalCh = this;
+		optimalScore = color ? int.MinValue:int.MaxValue;
+		
+		var score = Evaluate();
+
+		if (depth == 0 || score == 32000 || score == -32000){
+			optimalScore = score - (depth * (color ? 1:-1));
+			return optimalCh;
+		}
+		
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				var Piece = Pieces[i, j];
+
+				if (Piece != -1 && GetColor(Piece) == color){
+					var PieceMoves = PossibleMoves(Piece, i, j, false);
+					
+					for(int m = 0; m < 8; m++){
+						for(int n = 0; n < 8; n++){
+							if (PieceMoves[8 * m + n]){
+								var ChildCh = Move(i, j, m, n, false);
+								
+								var childMiniMax = ChildCh.MiniMax(!color, depth - 1, alpha, beta);
+								var childScore = childMiniMax.optimalScore;
+			
+								if (color   ?   (childScore > optimalScore) : (childScore < optimalScore)){
+									optimalCh = ChildCh;
+								}
+
+								if (color){
+									optimalScore = Math.Max(optimalScore, childScore);
+									alpha = Math.Max(alpha, childScore);
+								}
+								else{
+									optimalScore = Math.Min(optimalScore, childScore);
+									beta = Math.Min(beta, childScore);
+								}
+								
+								if (beta <= alpha){
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+		
+		return optimalCh;
+	}
+
+	public int Evaluate(){
+		var materialValue = 0;
+		
+		foreach (bool color in new bool[] {true, false}){
+			if (!CanMove(color)){
+				var k = LocateKing(color); // king location
+				var total = TotalCovered(!color);
+				
+				if (total[8 * k[0] + k[1]]){
+					if (!color){
+						return 32000;
+					}
+					else{
+						return -32000;
+					}
+				}
+				else{
+					return 0;
+				}
+			}
+		}
+
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				var Piece = Pieces[i, j];
+				if (Piece != -1){
+					var color = GetColor(Piece);
+					// Add white pieces value, subtract black pieces value
+					materialValue += Constants.PIECESVALUES[GetUniquePiece(Piece)] * (color ? 1:-1);
+				}
+			}
+		}
+		
+		return materialValue;
 	}
 }

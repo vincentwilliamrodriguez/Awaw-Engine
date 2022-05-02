@@ -41,7 +41,8 @@ func _input(event):
 				
 #				var temp = g.convertCS(g.MainChess)
 #				g.lastPossibleMoves = g.possibleMoves(piece,i,j,false,temp[0],temp[1])
-				g.lastPossibleMoves = g.MainChess.PossibleMoves(piece, i, j, false)
+				
+				g.lastPossibleMoves = g.ToGD(g.MainChess.PossibleMovesInt(piece, i, j, false), 8, 8)
 				
 				g.highlightBoard(g.lastPossibleMoves)
 				g.selected = true

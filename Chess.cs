@@ -77,17 +77,22 @@ public class Chess: Node
 		return i >= 0 && i <= 7 && j >= 0 && j <= 7;
 	}
 
-	
+	public static int[] BitToInt(BitArray inp){
+		int[] IntRes = new int[64];
 
-	public void Testing(){
-		GD.Print(g.Call("totalCovered", true, g.Get("pieces"), g.Get("gameRules")));
+		for(int m = 0; m < 64; m++){
+			IntRes[m] = Convert.ToInt16(inp[m]);
+		}
 
-		var Bits = new BitArray(64);
-		GD.Print(Bits);
+		return IntRes;
+	}
 
-		var t = new int[64];
-		Bits.CopyTo(t, 0);
-		// g.Call("Test", t);
+	public int[] PossibleMovesInt(int piece, int i, int j, bool total){
+		return BitToInt(PossibleMoves(piece, i, j, total));
+	}
+
+	public int[] TotalCoveredInt(bool color){
+		return BitToInt(TotalCovered(color));
 	}
 
 	// rays' 9th and 10th paramater removed
@@ -110,12 +115,14 @@ public class Chess: Node
 				if (n >= lim){
 					break;
 				}
-
+				var testing = Extension.In(d, 0, 2, 6, 8);
 				if (uniquePiece == 5 && Extension.In(d, 0, 2, 6, 8) && n == 1){
 					break;
 				}
 
-				cur.Zip(direction, (x, y) => x + y);
+				cur[0] += direction[0];
+				cur[1] += direction[1];
+
 				n += 1;
 						
 				if (!CheckLimit(cur)){
@@ -259,6 +266,23 @@ public class Chess: Node
 		Res.CopyTo(test, 0);
 		g.Call("test", test);
 		return Res;
+	}
+
+	// CanMove's 2nd and 3rd removed
+	public bool CanMove(bool color){
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				var Piece = Pieces[i, j];
+				
+				if (Piece != -1 && GetColor(Piece) == color){
+						var p = PossibleMoves(Piece, i, j, false);
+						if (p.Cast<bool>().Contains(true)){
+							return true;
+						}
+				}
+			}
+		}
+		return false;
 	}
 
 	// WillCheck's 7th and 8th parameter removed

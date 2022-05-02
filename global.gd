@@ -3,17 +3,12 @@ extends Node
 signal engineNext
 onready var thread = Thread.new()
 var num: int
-var cs
 
-onready var ChessClass = preload("res://Chess.cs")
-onready var MainChess = ChessClass.new().Init2(pieces, gameRules[0], gameRules[1])
+onready var CC = preload("res://Chess.cs")
+onready var MainChess = CC.new().Init2(pieces, gameRules[0], gameRules[1])
 
 func _ready():
-	MainChess.TotalCovered(true)
 	pass
-
-func test(inp):
-	print(inp)
 
 const BOARD = [
 [3,1,3,1,3,1,3,1],
@@ -134,7 +129,7 @@ func convertCS(Ch):
 	return [inp, rules]
 
 func ToGD(inp, r, c):
-	var res = gen2d(8, 8)
+	var res = gen2d(r, c)
 	
 	for i in r:
 		for j in c:
@@ -342,7 +337,7 @@ func AwawEngine(inputs: Array):
 	var temp = miniMax(inp, rules, color, 2)
 #	pieces = temp[0]
 #	gameRules = temp[1]
-	MainChess = ChessClass.new().Init2(temp[0], temp[1][0], temp[1][1])
+	MainChess = CC.new().Init2(temp[0], temp[1][0], temp[1][1])
 	
 	var end = OS.get_ticks_msec()
 	

@@ -335,8 +335,6 @@ func AwawEngine(inputs: Array):
 	print('Thinking')
 	
 	var temp = miniMax(inp, rules, color, 2)
-#	pieces = temp[0]
-#	gameRules = temp[1]
 	MainChess = CC.new().Init2(temp[0], temp[1][0], temp[1][1])
 	
 	var end = OS.get_ticks_msec()
@@ -361,6 +359,7 @@ func miniMax(inp1, rules1, color, depth, alpha = -INF, beta = INF):
 	
 	var inp = inp1.duplicate(true)
 	var rules = rules1.duplicate(true)
+	var Ch = CC.new().Init2(inp, rules[0], rules[1])
 	
 	var score = evaluate(inp, rules)
 	var optimalScore = -INF if color else INF
@@ -375,14 +374,19 @@ func miniMax(inp1, rules1, color, depth, alpha = -INF, beta = INF):
 		for j in 8:
 			var piece = inp[i][j]
 			if piece != -1 and getcolor(piece) == color:
-				var pieceMoves = possibleMoves(piece, i, j, false, inp, rules)
+				var tpieceMoves = Ch.PossibleMovesInt(piece, i, j, false)
+				var pieceMoves = ToGD(tpieceMoves, 8, 8)
 				
 				for m in 8:
 					for n in 8:
 						if pieceMoves[m][n] == 1:
-							var temp = move(piece, i, j, m, n, inp, false, rules)
+							var temp = convertCS(Ch.Move(i, j, m, n, false))
+	
 							var childPos = temp[0]
 							var childRules = temp[1]
+#							var temp = move(piece, i, j, m, n, inp, false, rules)
+#							var childPos = temp[0]
+#							var childRules = temp[1]
 							
 							var childMiniMax = miniMax(childPos, childRules, !color, depth - 1, alpha, beta)
 							var childScore = childMiniMax[2]
@@ -407,13 +411,16 @@ func miniMax(inp1, rules1, color, depth, alpha = -INF, beta = INF):
 func evaluate(inp1 = pieces, rules1 = gameRules):
 	var inp = inp1.duplicate(true)
 	var rules = rules1.duplicate(true)
+	var Ch = CC.new().Init2(inp, rules[0], rules[1])
 	
 	var materialValue = 0
 	
 	for color in [true, false]:
-		if not canMove(color, inp, rules):
-			var kingpos = locateking(color, inp)
-			if getindex(totalCovered(!color, inp, rules), kingpos):
+		if not Ch.CanMove(color):
+			var kingpos = Ch.LocateKing(color)
+			var t = ToGD(Ch.TotalCoveredInt(!color), 8, 8)
+			
+			if getindex(t, kingpos):
 				if !color:
 					return 32000
 				else:

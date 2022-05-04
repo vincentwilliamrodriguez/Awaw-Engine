@@ -8,6 +8,8 @@ onready var CC = preload("res://Chess.cs")
 onready var MainChess = CC.new().Init2(PIECES, CASTLING, EN_PASSANT)
 
 func _ready():
+	if turn != PLAYER:
+		thread.start(self, "AwawEngine", [])
 	pass
 
 const BOARD = [
@@ -35,6 +37,7 @@ const EN_PASSANT = [9, 9]
 const AWAW_ENGINE_ON = true;
 const AWAW_ENGINE_DEBUG = false;
 const DEPTH = 3;
+const PLAYER = true
 
 var board = BOARD.duplicate(true)
 
@@ -74,9 +77,7 @@ func highlightBoard(inp):
 func getcolor(piece):
 	return !bool(piece / 6)
 
-func nextTurn(i = 9, j = 9):
-	MainChess = MainChess.Move(lasti, lastj, i, j, false)
-	
+func nextTurn():
 	g.turn = !g.turn
 	
 	var score = MainChess.Evaluate()
@@ -88,7 +89,7 @@ func nextTurn(i = 9, j = 9):
 		print('Game Over, Black wins!')
 		gameOver = true
 		
-	if AWAW_ENGINE_ON and not turn and not gameOver:
+	if AWAW_ENGINE_ON and not (turn == PLAYER) and not gameOver:
 		if AWAW_ENGINE_DEBUG:
 			AwawEngine([])
 		else:
@@ -122,8 +123,7 @@ func AwawEngine(_inputs: Array):
 	print('Done')
 	print('Time: ' + String((float(end) - start) / 1000) + ' seconds\n')
 	
-	g.turn = !g.turn
-	num = 0
+	nextTurn()
 	
 	call_deferred("AwawEngineDone")
 	

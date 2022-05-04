@@ -5,7 +5,10 @@ onready var p = $pieces
 
 func _ready():
 	var _connect = g.connect("engineNext", self, "update")
-	update()
+	
+	# Promotion
+	showPromotions(true)
+	
 
 func update():
 	for i in 8:
@@ -17,7 +20,16 @@ func update():
 			b.set_cell(j1,i1,g.board[i][j])
 			p.set_cell(j1,i1,g.MainChess.Pieces[i * 8 + j])
 			
-
+func showPromotions(color):
+	var promotionList = VBoxContainer.new()
+	
+	for piece in [1, 2, 3, 4] if color else [6, 7, 8, 9]:
+		var pieceNode = TextureRect.new()
+		pieceNode.texture = load("res://res/assets/pcs/" + String(piece) + ".png")
+		promotionList.add_child(pieceNode)
+	
+	add_child(promotionList)
+	
 func _input(event):
 	if event.is_action_released("click"):
 		var pos = get_viewport().get_mouse_position()

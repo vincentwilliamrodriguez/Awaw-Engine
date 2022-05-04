@@ -17,9 +17,6 @@ config/icon="res://icon.png"
 [autoload]
 
 g="*res://global.gd"
-C="*res://Calc.cs"
-foo="*res://foo.gd"
-Bar="res://Bar.cs"
 
 [display]
 

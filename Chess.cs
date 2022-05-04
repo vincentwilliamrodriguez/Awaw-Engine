@@ -356,8 +356,7 @@ public class Chess: Node
 		if ((piece == 5 || piece == 11) && ti == (!color ? 7:0)){
 			Res.Pieces[ti, tj] = color ? 1:7;
 		}
-		
-		// Res.QueueFree();
+
 		return Res;
 	}
 
@@ -439,31 +438,15 @@ public class Chess: Node
 									optimalCh = ChildCh;
 									optimalScore = childScore;
 								}
-
-								// ChildCh.Free();
 							}
 						}
 					}
 				}
 			}
 		}
+
+		GD.Print("Optimal Score: " ,optimalScore);
 		return optimalCh;
-
-	}
-	public Chess MiniMaxIterative(bool color, int depth, 
-		int alpha = int.MinValue, int beta = int.MaxValue){		
-		
-		Chess Res = this;
-		var SnapshotStack = new Stack<Snapshot>();
-
-		Snapshot Cur = new Snapshot(color, depth, alpha, beta, 0);
-
-		SnapshotStack.Push(Cur);
-
-		while (SnapshotStack.Count > 0){
-			Cur = SnapshotStack.Pop();
-		}
-		return this;
 	}
 
 	public int Evaluate(){

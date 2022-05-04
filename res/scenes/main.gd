@@ -4,7 +4,7 @@ onready var b = $board
 onready var p = $pieces
 
 func _ready():
-	g.connect("engineNext", self, "update")
+	var _connect = g.connect("engineNext", self, "update")
 	update()
 
 func update():
@@ -21,7 +21,6 @@ func _input(event):
 		var i = index[1]
 		var j = index[0]
 		if g.checklimit(index):
-			var test = g.MainChess
 			var piece = g.MainChess.Pieces[8 * i + j]
 			
 			if g.selected:

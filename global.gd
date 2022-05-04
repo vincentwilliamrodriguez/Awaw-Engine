@@ -8,6 +8,9 @@ onready var CC = preload("res://Chess.cs")
 onready var MainChess = CC.new().Init2(pieces, gameRules[0], gameRules[1])
 
 func _ready():
+#	for i in 500000:
+#		var test = MainChess.Move(6, 4, 4, 4, false)
+#		test.queue_free()
 	pass
 
 const BOARD = [
@@ -31,6 +34,9 @@ const PIECES = [
 [4, 3, 2, 1, 0, 2, 3, 4]]
 
 const PIECESVALUES = [400, 900, 300, 300, 500, 100]
+const AWAW_ENGINE_ON = true;
+const AWAW_ENGINE_DEBUG = false;
+const DEPTH = 3;
 
 var pieces = PIECES.duplicate(true)
 var board = BOARD.duplicate(true)
@@ -118,9 +124,11 @@ func nextTurn(i = 9, j = 9):
 		print('Game Over, Black wins!')
 		gameOver = true
 		
-	if not turn and not gameOver:
-		thread.start(self, "AwawEngine", [MainChess, turn])
-#		AwawEngine([MainChess, turn])
+	if AWAW_ENGINE_ON and not turn and not gameOver:
+		if AWAW_ENGINE_DEBUG:
+			AwawEngine([MainChess, turn])
+		else:
+			thread.start(self, "AwawEngine", [MainChess, turn])
 
 func convertCS(Ch):
 	var inp = ToGD(Ch.Pieces, 8, 8)
@@ -337,13 +345,14 @@ func AwawEngine(inputs: Array):
 #	var temp = miniMax(inp, rules, color, 3)
 #	MainChess = CC.new().Init2(temp[0], temp[1][0], temp[1][1])
 	
-	var Res = MainChess.MiniMax(color, 3, -2147483648, 2147483647)
+#	var Res = MainChess.MiniMax(color, DEPTH, -2147483648, 2147483647)
+	var Res = MainChess.FindBestMove(color, DEPTH)
 	MainChess = Res
 	
 	var end = OS.get_ticks_msec()
 	
 	print('Done ' + String(num))
-	print('Optimal Score: ' + String(MainChess.optimalScore))
+#	print('Optimal Score: ' + String(MainChess.optimalScore))
 	print('Time: ' + String((float(end) - start) / 1000) + ' seconds\n')
 	
 	g.turn = !g.turn

@@ -21,6 +21,7 @@ func _input(event):
 		var i = index[1]
 		var j = index[0]
 		if g.checklimit(index):
+			var test = g.MainChess
 			var piece = g.MainChess.Pieces[8 * i + j]
 			
 			if g.selected:
@@ -33,8 +34,7 @@ func _input(event):
 				g.board = g.BOARD.duplicate(true)
 				
 				
-			elif piece != -1 and g.getcolor(piece) == g.turn and g.turn and not g.gameOver:
-#			elif piece != -1 and g.getcolor(piece) == g.turn and not g.gameOver:
+			elif piece != -1 and g.getcolor(piece) == g.turn and not g.gameOver and !(!g.turn and g.AWAW_ENGINE_ON):
 				g.sp = piece
 				g.lasti = i
 				g.lastj = j

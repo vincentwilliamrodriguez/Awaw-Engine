@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 
 public static class Extension
@@ -15,13 +16,25 @@ static class Constants
 	public static readonly int[] PIECESVALUES = new int[] {400, 900, 300, 300, 500, 100};
 }
 
+public struct Snapshot{
+	public bool color;
+	public int depth, alpha, beta, stage;
+
+	public Snapshot(bool color, int depth, int alpha, int beta, int stage){
+		this.color = color;
+		this.depth = depth;
+		this.alpha = alpha;
+		this.beta = beta;
+		this.stage = stage;
+	}
+}
+
 public class Chess: Node
 {
     int[,] Pieces;
 	int[,] CastlingRules;
 	int[] EnPassant;
 	int[] range9;
-	int optimalScore;
 
 	public Chess Init(int[,] pieces, int[,] castlingrules, int[] enpassant){
 		range9 = Enumerable.Range(0, 9).ToArray();
@@ -290,6 +303,9 @@ public class Chess: Node
 
 		var total = NextPos.TotalCovered(!color);
 		var k = NextPos.LocateKing(color); //king location
+
+		NextPos.Free();
+
 		return total[8 * k[0] + k[1]] == true;
 	}
 
@@ -341,21 +357,21 @@ public class Chess: Node
 			Res.Pieces[ti, tj] = color ? 1:7;
 		}
 		
+		// Res.QueueFree();
 		return Res;
 	}
 
 	//Minimax' 1st and 2nd parameters removed
-	public Chess MiniMax(bool color, int depth, 
+	public int MiniMax(bool color, int depth, 
 		int alpha = int.MinValue, int beta = int.MaxValue){		
 
-		Chess optimalCh = this;
-		optimalScore = color ? int.MinValue:int.MaxValue;
+		var optimalScore = color ? int.MinValue:int.MaxValue;
 		
 		var score = Evaluate();
 
 		if (depth == 0 || score == 32000 || score == -32000){
 			optimalScore = score - (depth * (color ? 1:-1));
-			return optimalCh;
+			return optimalScore;
 		}
 		
 		for(int i = 0; i < 8; i++){
@@ -370,12 +386,8 @@ public class Chess: Node
 							if (PieceMoves[8 * m + n]){
 								var ChildCh = Move(i, j, m, n, false);
 								
-								var childMiniMax = ChildCh.MiniMax(!color, depth - 1, alpha, beta);
-								var childScore = childMiniMax.optimalScore;
-			
-								if (color   ?   (childScore > optimalScore) : (childScore < optimalScore)){
-									optimalCh = ChildCh;
-								}
+								var childScore = ChildCh.MiniMax(!color, depth - 1, alpha, beta);
+								ChildCh.Free();
 
 								if (color){
 									optimalScore = Math.Max(optimalScore, childScore);
@@ -396,7 +408,62 @@ public class Chess: Node
 			}
 		}
 		
+		return optimalScore;
+	}
+
+	public Chess FindBestMove(bool color, int depth){
+		Chess optimalCh = this;
+
+		var score = Evaluate();
+		var optimalScore = color ? int.MinValue:int.MaxValue;
+
+		if (depth == 0 || score == 32000 || score == -32000){
+			return optimalCh;
+		}
+		
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				var Piece = Pieces[i, j];
+
+				if (Piece != -1 && GetColor(Piece) == color){
+					var PieceMoves = PossibleMoves(Piece, i, j, false);
+					
+					for(int m = 0; m < 8; m++){
+						for(int n = 0; n < 8; n++){
+							if (PieceMoves[8 * m + n]){
+								var ChildCh = Move(i, j, m, n, false);
+								
+								var childScore = ChildCh.MiniMax(!color, depth - 1);
+			
+								if (color   ?   (childScore > optimalScore) : (childScore < optimalScore)){
+									optimalCh = ChildCh;
+									optimalScore = childScore;
+								}
+
+								// ChildCh.Free();
+							}
+						}
+					}
+				}
+			}
+		}
 		return optimalCh;
+
+	}
+	public Chess MiniMaxIterative(bool color, int depth, 
+		int alpha = int.MinValue, int beta = int.MaxValue){		
+		
+		Chess Res = this;
+		var SnapshotStack = new Stack<Snapshot>();
+
+		Snapshot Cur = new Snapshot(color, depth, alpha, beta, 0);
+
+		SnapshotStack.Push(Cur);
+
+		while (SnapshotStack.Count > 0){
+			Cur = SnapshotStack.Pop();
+		}
+		return this;
 	}
 
 	public int Evaluate(){

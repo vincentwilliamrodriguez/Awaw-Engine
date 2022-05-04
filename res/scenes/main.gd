@@ -4,14 +4,15 @@ onready var b = $board
 onready var p = $pieces
 
 func _ready():
-	g.connect("engineNext", self, "update")
+	var _connect = g.connect("engineNext", self, "update")
 	update()
 
 func update():
 	for i in 8:
 		for j in 8:
 			b.set_cell(j,i,g.board[i][j])
-			p.set_cell(j,i,g.pieces[i][j])
+			p.set_cell(j,i,g.MainChess.Pieces[i * 8 + j])
+			
 
 func _input(event):
 	if event.is_action_released("click"):
@@ -20,7 +21,7 @@ func _input(event):
 		var i = index[1]
 		var j = index[0]
 		if g.checklimit(index):
-			var piece = g.pieces[i][j]
+			var piece = g.MainChess.Pieces[8 * i + j]
 			
 			if g.selected:
 				if g.lastPossibleMoves[i][j] == 1:
@@ -32,11 +33,15 @@ func _input(event):
 				g.board = g.BOARD.duplicate(true)
 				
 				
-			elif piece != -1 and g.getcolor(piece) == g.turn and g.turn and not g.gameOver:
+			elif piece != -1 and g.getcolor(piece) == g.turn and not g.gameOver and !(!g.turn and g.AWAW_ENGINE_ON):
 				g.sp = piece
 				g.lasti = i
 				g.lastj = j
-				g.lastPossibleMoves = g.possibleMoves(piece,i,j)
+				
+#				var temp = g.convertCS(g.MainChess)
+#				g.lastPossibleMoves = g.possibleMoves(piece,i,j,false,temp[0],temp[1])
+				
+				g.lastPossibleMoves = g.ToGD(g.MainChess.PossibleMovesInt(piece, i, j, false), 8, 8)
 				
 				g.highlightBoard(g.lastPossibleMoves)
 				g.selected = true

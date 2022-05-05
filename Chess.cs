@@ -310,7 +310,7 @@ public class Chess: Node
 	}
 
 	// Move's 1st, 6th, 8th parameter removed
-	public Chess Move(int i, int j, int ti, int tj, bool checking){
+	public Chess Move(int i, int j, int ti, int tj, bool checking, int promotion = -1){
 		var Res = new Chess();
 		Res = Res.Init(Pieces, CastlingRules, EnPassant);
 		
@@ -354,7 +354,7 @@ public class Chess: Node
 
 		//Promotion
 		if ((piece == 5 || piece == 11) && ti == (!color ? 7:0)){
-			Res.Pieces[ti, tj] = color ? 1:7;
+			Res.Pieces[ti, tj] = promotion;
 		}
 
 		return Res;
@@ -383,22 +383,30 @@ public class Chess: Node
 					for(int m = 0; m < 8; m++){
 						for(int n = 0; n < 8; n++){
 							if (PieceMoves[8 * m + n]){
-								var ChildCh = Move(i, j, m, n, false);
-								
-								var childScore = ChildCh.MiniMax(!color, depth - 1, alpha, beta);
-								ChildCh.Free();
+								// Promotions list for pawn
+								var Promotions = (GetUniquePiece(Piece)==5 && Extension.In(m, 0, 7)) ?
+													(color ? (new int[] {1, 2, 3, 4}) : //Promotion and white
+													(new int[] {7, 8, 9, 10})) : //Promotion and black
+													(new int[] {-1}); //Not promotion
 
-								if (color){
-									optimalScore = Math.Max(optimalScore, childScore);
-									alpha = Math.Max(alpha, childScore);
-								}
-								else{
-									optimalScore = Math.Min(optimalScore, childScore);
-									beta = Math.Min(beta, childScore);
-								}
-								
-								if (beta <= alpha){
-									break;
+								foreach (int PromotionPiece in Promotions){
+									var ChildCh = Move(i, j, m, n, false, PromotionPiece);
+									
+									var childScore = ChildCh.MiniMax(!color, depth - 1, alpha, beta);
+									ChildCh.Free();
+
+									if (color){
+										optimalScore = Math.Max(optimalScore, childScore);
+										alpha = Math.Max(alpha, childScore);
+									}
+									else{
+										optimalScore = Math.Min(optimalScore, childScore);
+										beta = Math.Min(beta, childScore);
+									}
+									
+									if (beta <= alpha){
+										break;
+									}
 								}
 							}
 						}
@@ -430,13 +438,21 @@ public class Chess: Node
 					for(int m = 0; m < 8; m++){
 						for(int n = 0; n < 8; n++){
 							if (PieceMoves[8 * m + n]){
-								var ChildCh = Move(i, j, m, n, false);
-								
-								var childScore = ChildCh.MiniMax(!color, depth - 1);
-			
-								if (color   ?   (childScore > optimalScore) : (childScore < optimalScore)){
-									optimalCh = ChildCh;
-									optimalScore = childScore;
+								// Promotions list for pawn
+								var Promotions = (GetUniquePiece(Piece)==5 && Extension.In(m, 0, 7)) ?
+													(color ? (new int[] {1, 2, 3, 4}) : //Promotion and white
+													(new int[] {7, 8, 9, 10})) : //Promotion and black
+													(new int[] {-1}); //Not promotion
+
+								foreach (int PromotionPiece in Promotions){
+									var ChildCh = Move(i, j, m, n, false, PromotionPiece);
+									
+									var childScore = ChildCh.MiniMax(!color, depth - 1);
+				
+									if (color   ?   (childScore > optimalScore) : (childScore < optimalScore)){
+										optimalCh = ChildCh;
+										optimalScore = childScore;
+									}
 								}
 							}
 						}

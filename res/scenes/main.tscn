@@ -255,32 +255,35 @@ cell_quadrant_size = 40
 format = 1
 tile_data = PoolIntArray( 0, 10, 0, 1, 9, 0, 2, 8, 0, 3, 7, 0, 4, 6, 0, 5, 8, 0, 6, 9, 0, 7, 10, 0, 65536, 11, 0, 65537, 11, 0, 65538, 11, 0, 65539, 11, 0, 65540, 11, 0, 65541, 11, 0, 65542, 11, 0, 65543, 11, 0, 393216, 5, 0, 393217, 5, 0, 393218, 5, 0, 393219, 5, 0, 393220, 5, 0, 393221, 5, 0, 393222, 5, 0, 393223, 5, 0, 458752, 4, 0, 458753, 3, 0, 458754, 2, 0, 458755, 1, 0, 458756, 0, 0, 458757, 2, 0, 458758, 3, 0, 458759, 4, 0 )
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
-margin_left = 920.0
-margin_top = 464.0
-margin_right = 1240.0
-margin_bottom = 1760.0
+[node name="ColorRect" type="ColorRect" parent="."]
+visible = false
+margin_right = 320.0
+margin_bottom = 1280.0
+
+[node name="VBoxContainer" type="VBoxContainer" parent="ColorRect"]
+margin_right = 320.0
+margin_bottom = 1296.0
 theme = SubResource( 3 )
 
-[node name="TextureRect" type="TextureRect" parent="VBoxContainer"]
+[node name="TextureRect" type="TextureRect" parent="ColorRect/VBoxContainer"]
 margin_right = 320.0
 margin_bottom = 320.0
 texture = ExtResource( 7 )
 stretch_mode = 4
 
-[node name="TextureRect2" type="TextureRect" parent="VBoxContainer"]
+[node name="TextureRect2" type="TextureRect" parent="ColorRect/VBoxContainer"]
 margin_top = 324.0
 margin_right = 320.0
 margin_bottom = 644.0
 texture = ExtResource( 7 )
 
-[node name="TextureRect3" type="TextureRect" parent="VBoxContainer"]
+[node name="TextureRect3" type="TextureRect" parent="ColorRect/VBoxContainer"]
 margin_top = 648.0
 margin_right = 320.0
 margin_bottom = 968.0
 texture = ExtResource( 7 )
 
-[node name="TextureRect4" type="TextureRect" parent="VBoxContainer"]
+[node name="TextureRect4" type="TextureRect" parent="ColorRect/VBoxContainer"]
 margin_top = 972.0
 margin_right = 320.0
 margin_bottom = 1292.0

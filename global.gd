@@ -8,7 +8,7 @@ onready var CC = preload("res://Chess.cs")
 onready var MainChess = CC.new().Init2(PIECES, CASTLING, EN_PASSANT)
 
 func _ready():
-	if turn != PLAYER:
+	if AWAW_ENGINE_ON and turn != PLAYER:
 		thread.start(self, "AwawEngine", [])
 	pass
 
@@ -37,14 +37,17 @@ const EN_PASSANT = [9, 9]
 const AWAW_ENGINE_ON = true;
 const AWAW_ENGINE_DEBUG = false;
 const DEPTH = 3;
-const PLAYER = true
+const PLAYER = false
 
 var board = BOARD.duplicate(true)
 
 var selected = false
+var pickPromotion = false
 var sp = -1 #Selected piece
 var lasti = 7
 var lastj = 7
+var proi = 9
+var proj = 9
 var lastPossibleMoves = []
 var gameOver = false
 
@@ -77,6 +80,9 @@ func highlightBoard(inp):
 func getcolor(piece):
 	return !bool(piece / 6)
 
+func getUniquePiece(piece):
+	return (piece - 6) if piece > 5 else piece
+	
 func nextTurn():
 	g.turn = !g.turn
 	

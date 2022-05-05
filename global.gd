@@ -10,7 +10,6 @@ onready var MainChess = CC.new()
 func _ready():
 	MainChess.InitZob()
 	MainChess.Init2(PIECES, CASTLING, EN_PASSANT, true)
-	print(MainChess.Hash)
 	
 	if AWAW_ENGINE_ON and MainChess.Turn != PLAYER:
 		thread.start(self, "AwawEngine", [])
@@ -38,7 +37,7 @@ const PIECES = [
 const CASTLING = [[1, 1], [1, 1]]
 const EN_PASSANT = [9, 9]
 
-const AWAW_ENGINE_ON = true;
+const AWAW_ENGINE_ON = false;
 const AWAW_ENGINE_DEBUG = false;
 const DEPTH = 2;
 const PLAYER = false
@@ -88,7 +87,8 @@ func getUniquePiece(piece):
 	return (piece - 6) if piece > 5 else piece
 	
 func nextTurn():
-#	print("Aw aw, ", MainChess.Hash)
+	print("Aw aw, ", MainChess.Hash)
+	MainChess.Test()
 	
 	var score = MainChess.Evaluate()
 	if score == 32000:
@@ -128,12 +128,12 @@ func AwawEngine(_inputs: Array):
 	var Res = MainChess.FindBestMove(MainChess.Turn, DEPTH)
 	MainChess = Res
 	
-	print(MainChess.Hash)
-	
 	var end = OS.get_ticks_msec()
 	
 	print('Done')
 	print('Time: ' + String((float(end) - start) / 1000) + ' seconds\n')
+	
+	MainChess.Test()
 	
 	nextTurn()
 	

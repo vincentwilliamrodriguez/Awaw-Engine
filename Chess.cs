@@ -4,14 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-public static class Extension
-{
-	public static bool In<T>(this T obj, params T[] args){
-		return args.Contains(obj);
-	}
-}
-
-static class Constants
+static class Auxilliary
 {
 	public static readonly int[] PIECESVALUES = new int[] {400, 900, 300, 300, 500, 100};
 	public static List<long> zob;
@@ -26,6 +19,10 @@ static class Constants
 			zob.Add(BitConverter.ToInt64(buf, 0));
 		}
 	}
+
+	public static bool In<T>(this T obj, params T[] args){
+		return args.Contains(obj);
+	}
 }
 
 public class Chess: Node
@@ -36,44 +33,81 @@ public class Chess: Node
 	int[] range9;
 	bool Turn;
 	long Hash;
+	List<long> Log;
 
-	public void InitZob(){
-		Constants.InitZob();
+	public void Test(){
+		// foreach (long val in Log){
+		// 	GD.Print(val);
+		// }
+
+		GD.Print((from temp in Log where temp.Equals(Hash) select temp).Count());
 	}
 
-	public Chess Init(int[,] pieces, int[,] castlingrules, int[] enpassant, bool turn){
+	public void InitZob(){
+		Auxilliary.InitZob();
+	}
+
+	public Chess Init(int[,] pieces, int[,] castlingrules, 
+						int[] enpassant, bool turn, List<long> log){
+		
 		range9 = Enumerable.Range(0, 9).ToArray();
 
 		Pieces = (int[,]) pieces.Clone();
 		CastlingRules = (int[,]) castlingrules.Clone();
 		EnPassant = (int[]) enpassant.Clone();
 		Turn = turn;
+		Log = new List<long>(log);
 
-		UpdateHash();
-		
 		return this;
 	}
 
 	public Chess Init2(Godot.Collections.Array<Godot.Collections.Array<int>> pieces,
 						Godot.Collections.Array<Godot.Collections.Array<int>> castlingrules,
 						int[] enpassant, bool turn){
-		return Init(ToCS(pieces), ToCS(castlingrules), enpassant, turn);
+
+		Log = new List<long>();
+		var Res = Init(ToCS(pieces), ToCS(castlingrules), enpassant, turn, Log);
+		UpdateHash();
+		return Res;
 	}
 
 	public void UpdateHash(){
 		long Res = 0;
 
+		//Piece
 		for(int i = 0; i < 8; i++){
 			for(int j = 0; j < 8; j++){
 				var Piece = Pieces[i, j];
 
 				if (Piece != -1){
-					Res = Res ^ Constants.zob[8*12*i + 12*j + Piece];
+					Res = Res ^ Auxilliary.zob[8*12*i + 12*j + Piece];
 				}
 			}
 		}
 
+		//Turn is black
+		if (!Turn){
+			Res = Res ^ Auxilliary.zob[768]; 
+		}
+
+		//Castling rules
+		for(int i = 0; i < 2; i++){
+			for(int j = 0; j < 2; j++){
+				if (CastlingRules[i, j] == 1){
+					Res = Res ^ Auxilliary.zob[769 + 2*i + j];
+				}
+			}
+		}
+
+		//En passant
+		for(int j = 0; j < 8; j++){
+			if (EnPassant[1] == j){
+				Res = Res ^ Auxilliary.zob[773 + j];
+			}
+		}
+
 		Hash = Res;
+		Log.Add(Hash);
 	}
 
 	public static T[,] ToCS<T>(Godot.Collections.Array<Godot.Collections.Array<T>> inp){
@@ -155,8 +189,8 @@ public class Chess: Node
 				if (n >= lim){
 					break;
 				}
-				var testing = Extension.In(d, 0, 2, 6, 8);
-				if (uniquePiece == 5 && Extension.In(d, 0, 2, 6, 8) && n == 1){
+				var testing = Auxilliary.In(d, 0, 2, 6, 8);
+				if (uniquePiece == 5 && Auxilliary.In(d, 0, 2, 6, 8) && n == 1){
 					break;
 				}
 
@@ -171,12 +205,12 @@ public class Chess: Node
 
 				if (Pieces[cur[0], cur[1]] == -1){ //If square is empty
 					if (uniquePiece == 5){
-						if (!t && Extension.In(d, 0, 2, 6, 8)){
+						if (!t && Auxilliary.In(d, 0, 2, 6, 8)){
 							if (!(cur[0] == EnPassant[0] && cur[1] == EnPassant[1])){
 								break;
 							}
 						}
-						if (t && Extension.In(d, 1, 7)){
+						if (t && Auxilliary.In(d, 1, 7)){
 							break;
 						}
 					}
@@ -191,12 +225,12 @@ public class Chess: Node
 
 				else{ // Square has piece
 					// Check if total and not (Piece is pawn and d is forward)
-					if (t && !(uniquePiece == 5 && Extension.In(d, 1, 7))){
+					if (t && !(uniquePiece == 5 && Auxilliary.In(d, 1, 7))){
 						Res[8 * cur[0] + cur[1]] = true;
 						break;
 					}
 					if (color != GetColor(Pieces[cur[0], cur[1]])){ // If piece is opposite color
-						if (uniquePiece == 5 && Extension.In(d, 1, 7)){
+						if (uniquePiece == 5 && Auxilliary.In(d, 1, 7)){
 							break;
 						}
 
@@ -335,9 +369,11 @@ public class Chess: Node
 	}
 
 	// Move's 1st, 6th, 8th parameter removed
-	public Chess Move(int i, int j, int ti, int tj, bool checking, int promotion = -1){
+	public Chess Move(int i, int j, int ti, int tj, 
+						bool checking, int promotion = -1){
+		
 		var Res = new Chess();
-		Res = Res.Init(Pieces, CastlingRules, EnPassant, !Turn);
+		Res = Res.Init(Pieces, CastlingRules, EnPassant, !Turn, Log);
 		
 		var piece = Res.Pieces[i, j];
 		var color = GetColor(piece);
@@ -413,7 +449,7 @@ public class Chess: Node
 						for(int n = 0; n < 8; n++){
 							if (PieceMoves[8 * m + n]){
 								// Promotions list for pawn
-								var Promotions = (GetUniquePiece(Piece)==5 && Extension.In(m, 0, 7)) ?
+								var Promotions = (GetUniquePiece(Piece)==5 && Auxilliary.In(m, 0, 7)) ?
 													(color ? (new int[] {1, 2, 3, 4}) : //Promotion and white
 													(new int[] {7, 8, 9, 10})) : //Promotion and black
 													(new int[] {-1}); //Not promotion
@@ -470,7 +506,7 @@ public class Chess: Node
 						for(int n = 0; n < 8; n++){
 							if (PieceMoves[8 * m + n]){
 								// Promotions list for pawn
-								var Promotions = (GetUniquePiece(Piece)==5 && Extension.In(m, 0, 7)) ?
+								var Promotions = (GetUniquePiece(Piece)==5 && Auxilliary.In(m, 0, 7)) ?
 													(color ? (new int[] {1, 2, 3, 4}) : //Promotion and white
 													(new int[] {7, 8, 9, 10})) : //Promotion and black
 													(new int[] {-1}); //Not promotion
@@ -525,7 +561,7 @@ public class Chess: Node
 				if (Piece != -1){
 					var color = GetColor(Piece);
 					// Add white pieces value, subtract black pieces value
-					materialValue += Constants.PIECESVALUES[GetUniquePiece(Piece)] * (color ? 1:-1);
+					materialValue += Auxilliary.PIECESVALUES[GetUniquePiece(Piece)] * (color ? 1:-1);
 				}
 			}
 		}

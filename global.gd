@@ -5,10 +5,14 @@ onready var thread = Thread.new()
 var num: int
 
 onready var CC = preload("res://Chess.cs")
-onready var MainChess = CC.new().Init2(PIECES, CASTLING, EN_PASSANT)
+onready var MainChess = CC.new()
 
 func _ready():
-	if AWAW_ENGINE_ON and turn != PLAYER:
+	MainChess.InitZob()
+	MainChess.Init2(PIECES, CASTLING, EN_PASSANT, true)
+	print(MainChess.Hash)
+	
+	if AWAW_ENGINE_ON and MainChess.Turn != PLAYER:
 		thread.start(self, "AwawEngine", [])
 	pass
 
@@ -36,7 +40,7 @@ const EN_PASSANT = [9, 9]
 
 const AWAW_ENGINE_ON = true;
 const AWAW_ENGINE_DEBUG = false;
-const DEPTH = 3;
+const DEPTH = 2;
 const PLAYER = false
 
 var board = BOARD.duplicate(true)
@@ -84,7 +88,7 @@ func getUniquePiece(piece):
 	return (piece - 6) if piece > 5 else piece
 	
 func nextTurn():
-	g.turn = !g.turn
+#	print("Aw aw, ", MainChess.Hash)
 	
 	var score = MainChess.Evaluate()
 	if score == 32000:
@@ -95,7 +99,7 @@ func nextTurn():
 		print('Game Over, Black wins!')
 		gameOver = true
 		
-	if AWAW_ENGINE_ON and not (turn == PLAYER) and not gameOver:
+	if AWAW_ENGINE_ON and not (MainChess.Turn == PLAYER) and not gameOver:
 		if AWAW_ENGINE_DEBUG:
 			AwawEngine([])
 		else:
@@ -121,8 +125,10 @@ func AwawEngine(_inputs: Array):
 	
 	print('Thinking')
 	
-	var Res = MainChess.FindBestMove(turn, DEPTH)
+	var Res = MainChess.FindBestMove(MainChess.Turn, DEPTH)
 	MainChess = Res
+	
+	print(MainChess.Hash)
 	
 	var end = OS.get_ticks_msec()
 	

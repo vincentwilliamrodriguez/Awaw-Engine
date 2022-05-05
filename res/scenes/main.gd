@@ -51,7 +51,7 @@ func removePromotions():
 
 func _input(event):
 	if event.is_action_released("click"):
-		var player_turn = (g.turn == g.PLAYER) or !g.AWAW_ENGINE_ON
+		var player_turn = (g.MainChess.Turn == g.PLAYER) or !g.AWAW_ENGINE_ON
 		
 		var pos = get_viewport().get_mouse_position()
 		var index = p.world_to_map(pos)
@@ -67,7 +67,7 @@ func _input(event):
 			if g.selected:
 				if g.lastPossibleMoves[i][j] == 1:
 					if g.getUniquePiece(g.MainChess.Pieces[8*g.lasti + g.lastj]) == 5 and i in [7, 0]:
-						showPromotions(g.turn, j)
+						showPromotions(g.MainChess.Turn, j)
 						g.proi = i
 						g.proj = j
 					else:
@@ -80,7 +80,7 @@ func _input(event):
 				g.board = g.BOARD.duplicate(true)
 				
 				
-			elif piece != -1 and g.getcolor(piece) == g.turn and not g.gameOver and player_turn and !get_node_or_null("promotionList"):
+			elif piece != -1 and g.getcolor(piece) == g.MainChess.Turn and not g.gameOver and player_turn and !get_node_or_null("promotionList"):
 				g.sp = piece
 				g.lasti = i
 				g.lastj = j

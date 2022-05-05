@@ -14,18 +14,17 @@ public static class Extension
 static class Constants
 {
 	public static readonly int[] PIECESVALUES = new int[] {400, 900, 300, 300, 500, 100};
-}
+	public static List<long> zob;
 
-public struct Snapshot{
-	public bool color;
-	public int depth, alpha, beta, stage;
+	public static void InitZob(){
+		var ran = new Random(81141418);
+		zob = new List<long>();
 
-	public Snapshot(bool color, int depth, int alpha, int beta, int stage){
-		this.color = color;
-		this.depth = depth;
-		this.alpha = alpha;
-		this.beta = beta;
-		this.stage = stage;
+		for(int i = 0; i < 781; i++){
+			byte[] buf = new byte[8];
+			ran.NextBytes(buf);
+			zob.Add(BitConverter.ToInt64(buf, 0));
+		}
 	}
 }
 
@@ -35,20 +34,46 @@ public class Chess: Node
 	int[,] CastlingRules;
 	int[] EnPassant;
 	int[] range9;
+	bool Turn;
+	long Hash;
 
-	public Chess Init(int[,] pieces, int[,] castlingrules, int[] enpassant){
+	public void InitZob(){
+		Constants.InitZob();
+	}
+
+	public Chess Init(int[,] pieces, int[,] castlingrules, int[] enpassant, bool turn){
 		range9 = Enumerable.Range(0, 9).ToArray();
 
 		Pieces = (int[,]) pieces.Clone();
 		CastlingRules = (int[,]) castlingrules.Clone();
 		EnPassant = (int[]) enpassant.Clone();
+		Turn = turn;
+
+		UpdateHash();
+		
 		return this;
 	}
 
 	public Chess Init2(Godot.Collections.Array<Godot.Collections.Array<int>> pieces,
 						Godot.Collections.Array<Godot.Collections.Array<int>> castlingrules,
-						int[] enpassant){
-		return Init(ToCS(pieces), ToCS(castlingrules), enpassant);
+						int[] enpassant, bool turn){
+		return Init(ToCS(pieces), ToCS(castlingrules), enpassant, turn);
+	}
+
+	public void UpdateHash(){
+		long Res = 0;
+
+		for(int i = 0; i < 8; i++){
+			for(int j = 0; j < 8; j++){
+				var Piece = Pieces[i, j];
+
+				if (Piece != -1){
+					Res = Res ^ Constants.zob[8*12*i + 12*j + Piece];
+				}
+			}
+		}
+
+		Hash = Res;
 	}
 
 	public static T[,] ToCS<T>(Godot.Collections.Array<Godot.Collections.Array<T>> inp){
@@ -287,10 +312,10 @@ public class Chess: Node
 				var Piece = Pieces[i, j];
 				
 				if (Piece != -1 && GetColor(Piece) == color){
-						var p = PossibleMoves(Piece, i, j, false);
-						if (p.Cast<bool>().Contains(true)){
-							return true;
-						}
+					var p = PossibleMoves(Piece, i, j, false);
+					if (p.Cast<bool>().Contains(true)){
+						return true;
+					}
 				}
 			}
 		}
@@ -312,7 +337,7 @@ public class Chess: Node
 	// Move's 1st, 6th, 8th parameter removed
 	public Chess Move(int i, int j, int ti, int tj, bool checking, int promotion = -1){
 		var Res = new Chess();
-		Res = Res.Init(Pieces, CastlingRules, EnPassant);
+		Res = Res.Init(Pieces, CastlingRules, EnPassant, !Turn);
 		
 		var piece = Res.Pieces[i, j];
 		var color = GetColor(piece);
@@ -336,6 +361,7 @@ public class Chess: Node
 		//Check if the move is Castling
 		if ((piece == 0 || piece == 6) && j == 4 && Math.Abs(tj - j) == 2){
 			Res = Res.Move(i, tj == 2 ? 0:7, ti, tj == 2 ? 3:5, false); //Moving Rook
+			Res.Turn = !this.Turn;
 		}
 
 		// En Passant
@@ -356,6 +382,9 @@ public class Chess: Node
 		if ((piece == 5 || piece == 11) && ti == (!color ? 7:0)){
 			Res.Pieces[ti, tj] = promotion;
 		}
+
+		//Initialize Hash after moves
+		Res.UpdateHash();
 
 		return Res;
 	}
@@ -419,6 +448,8 @@ public class Chess: Node
 	}
 
 	public Chess FindBestMove(bool color, int depth){
+		GD.Print("Before: ", Hash);
+
 		Chess optimalCh = this;
 
 		var score = Evaluate();
@@ -461,7 +492,8 @@ public class Chess: Node
 			}
 		}
 
-		GD.Print("Optimal Score: " ,optimalScore);
+		GD.Print("Optimal Score: " , optimalScore);
+		GD.Print("After: ", optimalCh.Hash);
 		return optimalCh;
 	}
 

@@ -40,7 +40,7 @@ const EN_PASSANT = [9, 9]
 const AWAW_ENGINE_ON = false;
 const AWAW_ENGINE_DEBUG = false;
 const DEPTH = 2;
-const PLAYER = false
+const PLAYER = true
 
 var board = BOARD.duplicate(true)
 
@@ -52,9 +52,6 @@ var lastj = 7
 var proi = 9
 var proj = 9
 var lastPossibleMoves = []
-var gameOver = false
-
-var turn = true
 
 func gen2d(l,w,v = 0):
 	var list = []
@@ -90,16 +87,19 @@ func nextTurn():
 	print("Aw aw, ", MainChess.Hash)
 	MainChess.Test()
 	
-	var score = MainChess.Evaluate()
-	if score == 32000:
-		print('Game Over, White wins!')
-		gameOver = true
-		
-	elif score == -32000:
-		print('Game Over, Black wins!')
-		gameOver = true
-		
-	if AWAW_ENGINE_ON and not (MainChess.Turn == PLAYER) and not gameOver:
+	var outcome = MainChess.Outcome
+	
+	match (outcome):
+		1:
+			print('Game Over, White wins!')
+		2:
+			print('Game Over, Black wins!')
+		3:
+			print('Game Over, Draw by Stalemate!')
+		4:
+			print('Game Over, Draw by Threefold Repetition!')
+			
+	if AWAW_ENGINE_ON and not (MainChess.Turn == PLAYER) and not outcome:
 		if AWAW_ENGINE_DEBUG:
 			AwawEngine([])
 		else:

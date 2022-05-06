@@ -80,7 +80,7 @@ func _input(event):
 				g.board = g.BOARD.duplicate(true)
 				
 				
-			elif piece != -1 and g.getcolor(piece) == g.MainChess.Turn and not g.gameOver and player_turn and !get_node_or_null("promotionList"):
+			elif piece != -1 and g.getcolor(piece) == g.MainChess.Turn and not g.MainChess.Outcome and player_turn and !get_node_or_null("promotionList"):
 				g.sp = piece
 				g.lasti = i
 				g.lastj = j

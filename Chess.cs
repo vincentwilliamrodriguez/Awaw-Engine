@@ -34,6 +34,7 @@ public class Chess: Node
 	bool Turn;
 	long Hash;
 	List<long> Log;
+	int Outcome;
 
 	public void Test(){
 		// foreach (long val in Log){
@@ -41,6 +42,7 @@ public class Chess: Node
 		// }
 
 		GD.Print((from temp in Log where temp.Equals(Hash) select temp).Count());
+		GD.Print(Outcome);
 	}
 
 	public void InitZob(){
@@ -67,7 +69,10 @@ public class Chess: Node
 
 		Log = new List<long>();
 		var Res = Init(ToCS(pieces), ToCS(castlingrules), enpassant, turn, Log);
+
 		UpdateHash();
+		UpdateOutcome();
+
 		return Res;
 	}
 
@@ -108,6 +113,38 @@ public class Chess: Node
 
 		Hash = Res;
 		Log.Add(Hash);
+	}
+
+	public int CheckOutcome(){
+		var repetition = (from temp in Log where temp.Equals(Hash) select temp).Count();
+
+		if (repetition >= 3){
+			return 4; // Threefold repetition
+		}
+
+		foreach (bool color in new bool[] {true, false}){
+			if (!CanMove(!color)){ // if enemy can't move
+				var k = LocateKing(!color); // enemy king location
+				var total = TotalCovered(color); // total covered of color
+				
+				if (total[8 * k[0] + k[1]]){ // if enemy is in check
+					if (color){
+						return 1; // White checkmates black
+					}
+					else{
+						return 2; // Black checkmates white
+					}
+				}
+				else{
+					return 3; // Stalemate
+				}
+			}
+		}
+		return 0;
+	}
+
+	public void UpdateOutcome(){
+		this.Outcome = CheckOutcome();
 	}
 
 	public static T[,] ToCS<T>(Godot.Collections.Array<Godot.Collections.Array<T>> inp){
@@ -419,8 +456,13 @@ public class Chess: Node
 			Res.Pieces[ti, tj] = promotion;
 		}
 
-		//Initialize Hash after moves
-		Res.UpdateHash();
+		if (!checking){
+			//Initialize Hash after moves
+			Res.UpdateHash();
+
+			//Update game outcome
+			Res.UpdateOutcome();
+		}
 
 		return Res;
 	}
@@ -536,23 +578,15 @@ public class Chess: Node
 	public int Evaluate(){
 		var materialValue = 0;
 		
-		foreach (bool color in new bool[] {true, false}){
-			if (!CanMove(color)){
-				var k = LocateKing(color); // king location
-				var total = TotalCovered(!color);
+		switch (Outcome){
+			case 1:
+				return 32000;
 				
-				if (total[8 * k[0] + k[1]]){
-					if (!color){
-						return 32000;
-					}
-					else{
-						return -32000;
-					}
-				}
-				else{
-					return 0;
-				}
-			}
+			case 2:
+				return -32000;
+
+			case 3: case 4:
+				return 0;
 		}
 
 		for(int i = 0; i < 8; i++){

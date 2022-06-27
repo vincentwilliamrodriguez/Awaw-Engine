@@ -11,12 +11,12 @@ config_version=4
 [application]
 
 config/name="Awaw engine"
-run/main_scene="res://res/scenes/main.tscn"
+run/main_scene="res://Chess/res/scenes/main.tscn"
 config/icon="res://icon.png"
 
 [autoload]
 
-g="*res://global.gd"
+g="*res://Chess/global.gd"
 
 [display]
 

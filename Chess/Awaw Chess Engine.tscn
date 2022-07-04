@@ -1,9 +1,9 @@
 [gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Chess/res/scenes/main.gd" type="Script" id=1]
-[ext_resource path="res://Chess/res/assets/board/black.png" type="Texture" id=2]
-[ext_resource path="res://Chess/res/assets/board/white.png" type="Texture" id=3]
-[ext_resource path="res://Chess/res/assets/pcs/1.png" type="Texture" id=4]
+[ext_resource path="res://Chess/res/assets/pcs/1.png" type="Texture" id=2]
+[ext_resource path="res://Chess/res/assets/board/black.png" type="Texture" id=3]
+[ext_resource path="res://Chess/res/assets/board/white.png" type="Texture" id=4]
 [ext_resource path="res://Chess/res/assets/1920px-Chess_Pieces_Sprite.svg.png" type="Texture" id=5]
 [ext_resource path="res://Chess/res/assets/board/white red.png" type="Texture" id=6]
 [ext_resource path="res://Chess/res/assets/board/black red.png" type="Texture" id=7]
@@ -24,7 +24,7 @@
 0/shapes = [  ]
 0/z_index = 0
 1/name = "black.png 1"
-1/texture = ExtResource( 2 )
+1/texture = ExtResource( 3 )
 1/tex_offset = Vector2( 0, 0 )
 1/modulate = Color( 1, 1, 1, 1 )
 1/region = Rect2( 0, 0, 320, 320 )
@@ -52,7 +52,7 @@
 2/shapes = [  ]
 2/z_index = 0
 3/name = "white.png 3"
-3/texture = ExtResource( 3 )
+3/texture = ExtResource( 4 )
 3/tex_offset = Vector2( 0, 0 )
 3/modulate = Color( 1, 1, 1, 1 )
 3/region = Rect2( 0, 0, 320, 320 )
@@ -238,7 +238,7 @@
 
 [sub_resource type="Theme" id=3]
 
-[node name="main" type="Node2D"]
+[node name="Awaw Chess Engine" type="Node2D"]
 script = ExtResource( 1 )
 
 [node name="board" type="TileMap" parent="."]
@@ -268,23 +268,23 @@ theme = SubResource( 3 )
 [node name="TextureRect" type="TextureRect" parent="ColorRect/VBoxContainer"]
 margin_right = 320.0
 margin_bottom = 320.0
-texture = ExtResource( 4 )
+texture = ExtResource( 2 )
 stretch_mode = 4
 
 [node name="TextureRect2" type="TextureRect" parent="ColorRect/VBoxContainer"]
 margin_top = 324.0
 margin_right = 320.0
 margin_bottom = 644.0
-texture = ExtResource( 4 )
+texture = ExtResource( 2 )
 
 [node name="TextureRect3" type="TextureRect" parent="ColorRect/VBoxContainer"]
 margin_top = 648.0
 margin_right = 320.0
 margin_bottom = 968.0
-texture = ExtResource( 4 )
+texture = ExtResource( 2 )
 
 [node name="TextureRect4" type="TextureRect" parent="ColorRect/VBoxContainer"]
 margin_top = 972.0
 margin_right = 320.0
 margin_bottom = 1292.0
-texture = ExtResource( 4 )
+texture = ExtResource( 2 )

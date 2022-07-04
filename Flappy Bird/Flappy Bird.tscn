@@ -1,0 +1,67 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Flappy Bird/res/Flappy Bird Spritesheet.png" type="Texture" id=1]
+[ext_resource path="res://Flappy Bird/Flappy Bird.gd" type="Script" id=2]
+[ext_resource path="res://Flappy Bird/Timer.gd" type="Script" id=3]
+[ext_resource path="res://Flappy Bird/Floor.gd" type="Script" id=4]
+
+[sub_resource type="RectangleShape2D" id=1]
+extents = Vector2( 1288.5, 53 )
+
+[node name="Flappy Bird" type="Node2D"]
+script = ExtResource( 2 )
+
+[node name="Background" type="CanvasLayer" parent="."]
+layer = -1
+
+[node name="Background" type="Sprite" parent="Background"]
+position = Vector2( 0, 5689 )
+scale = Vector2( 17.77, 17.77 )
+texture = ExtResource( 1 )
+centered = false
+offset = Vector2( 0, -252 )
+region_enabled = true
+region_rect = Rect2( 0, 0, 144, 252 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="ColorRect" type="ColorRect" parent="Background"]
+margin_right = 2560.0
+margin_bottom = 1239.0
+color = Color( 0.482353, 0.772549, 0.803922, 1 )
+
+[node name="Pipes" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="Floor" type="CanvasLayer" parent="."]
+
+[node name="Floor" type="StaticBody2D" parent="Floor"]
+position = Vector2( 0, 5689 )
+collision_layer = 2
+script = ExtResource( 4 )
+
+[node name="Floor" type="Sprite" parent="Floor/Floor"]
+scale = Vector2( 17.77, 17.77 )
+z_index = 1
+texture = ExtResource( 1 )
+centered = false
+offset = Vector2( 0, -55 )
+region_enabled = true
+region_rect = Rect2( 147, 1, 144, 55 )
+__meta__ = {
+"_edit_lock_": true
+}
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor/Floor"]
+position = Vector2( 1281.5, -923 )
+shape = SubResource( 1 )
+
+[node name="Birds" type="CanvasLayer" parent="."]
+layer = 0
+
+[node name="Timer" type="Timer" parent="."]
+wait_time = 0.5
+script = ExtResource( 3 )
+
+[connection signal="timeout" from="Timer" to="Timer" method="_on_Timer_timeout"]

@@ -11,22 +11,22 @@ config_version=4
 [application]
 
 config/name="Awaw engine"
-run/main_scene="res://res/scenes/main.tscn"
-config/icon="res://icon.png"
+run/main_scene="res://menu.tscn"
+config/icon="res://man face white background.png"
 
 [autoload]
 
-g="*res://global.gd"
+g="*res://Chess/global.gd"
 
 [display]
 
 window/size/width=2560
 window/size/height=5689
 window/size/always_on_top=true
-window/size/test_width=720
+window/size/test_width=324
 window/size/test_height=720
 window/handheld/orientation="portrait"
-window/stretch/shrink=0.28
+window/stretch/mode="2d"
 
 [editor_plugins]
 
@@ -45,6 +45,11 @@ singletons=[  ]
 click={
 "deadzone": 0.5,
 "events": [ Object(InputEventMouseButton,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"button_mask":0,"position":Vector2( 0, 0 ),"global_position":Vector2( 0, 0 ),"factor":1.0,"button_index":1,"pressed":false,"doubleclick":false,"script":null)
+ ]
+}
+space={
+"deadzone": 0.5,
+"events": [ Object(InputEventKey,"resource_local_to_scene":false,"resource_name":"","device":0,"alt":false,"shift":false,"control":false,"meta":false,"command":false,"pressed":false,"scancode":0,"physical_scancode":32,"unicode":0,"echo":false,"script":null)
  ]
 }
 

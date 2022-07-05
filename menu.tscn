@@ -1,0 +1,53 @@
+[gd_scene load_steps=5 format=2]
+
+[ext_resource path="res://menu.gd" type="Script" id=1]
+[ext_resource path="res://Arima-VariableFont_wght.ttf" type="DynamicFontData" id=2]
+
+[sub_resource type="DynamicFont" id=1]
+size = 177
+font_data = ExtResource( 2 )
+
+[sub_resource type="Theme" id=2]
+default_font = SubResource( 1 )
+
+[node name="Menu" type="Control"]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -1280.0
+margin_top = -2844.5
+margin_right = 1280.0
+margin_bottom = 2844.5
+theme = SubResource( 2 )
+script = ExtResource( 1 )
+
+[node name="ColorRect" type="ColorRect" parent="."]
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color( 0.427451, 0.266667, 1, 1 )
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+margin_left = -765.5
+margin_top = -298.0
+margin_right = 765.5
+margin_bottom = 298.0
+custom_constants/separation = 128
+
+[node name="Awaw Chess" type="Button" parent="VBoxContainer"]
+margin_right = 1531.0
+margin_bottom = 296.0
+text = "Awaw Chess Engine"
+
+[node name="Flappy Bird" type="Button" parent="VBoxContainer"]
+margin_top = 424.0
+margin_right = 1531.0
+margin_bottom = 720.0
+text = "Flappy Bird NEAT"
+
+[connection signal="pressed" from="VBoxContainer/Awaw Chess" to="." method="_on_Awaw_Chess_pressed"]
+[connection signal="pressed" from="VBoxContainer/Flappy Bird" to="." method="_on_Flappy_Bird_pressed"]

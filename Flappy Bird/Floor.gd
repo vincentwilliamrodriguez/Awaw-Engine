@@ -1,11 +1,19 @@
 extends StaticBody2D
 
+var spawned = false
+const names = ["Floor 1", "Floor 2", "Floor 3"]
+
 func _physics_process(delta):
-	print(get_parent().get_child_count())
-	if get_parent().get_child_count() < 3 and position.x <= 0:
+	if !spawned and position.x <= 0:
 		var f = self.duplicate()
-		f.position.x = 2470
+		f.position.x = 2500
+		
+		var nameIndex = names.find(name)
+		f.name = names[(nameIndex + 1) % 3]
+		
 		get_parent().add_child(f)
+		
+		spawned = true
 		
 	if position.x <= -2560:
 		queue_free()

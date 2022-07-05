@@ -35,11 +35,10 @@ script = ExtResource( 2 )
 [node name="Bird" type="AnimatedSprite" parent="."]
 scale = Vector2( 17.77, 17.77 )
 frames = SubResource( 4 )
+frame = 1
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 rotation = 1.5708
 scale = Vector2( 17.77, 17.77 )
 shape = SubResource( 5 )
-
-[node name="Node2D" type="Node2D" parent="."]

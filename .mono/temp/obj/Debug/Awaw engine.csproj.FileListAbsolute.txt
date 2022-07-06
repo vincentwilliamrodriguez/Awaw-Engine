@@ -1,8 +1,9 @@
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\bin\Debug\Awaw engine.dll
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\bin\Debug\Awaw engine.pdb
-C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.csprojAssemblyReference.cache
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.AssemblyInfoInputs.cache
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.AssemblyInfo.cs
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.csproj.CoreCompileInputs.cache
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.dll
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.pdb
+C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.csproj.AssemblyReference.cache
+C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.GeneratedMSBuildEditorConfig.editorconfig

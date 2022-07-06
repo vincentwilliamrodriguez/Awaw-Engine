@@ -1,11 +1,11 @@
 {
   "version": 2,
-  "dgSpecHash": "0zaQa2jTqKyIDbslz8SqXJ1otomzYR6dDQGb0OMj0A7FMu+gdnI7Co3GkbW2s9WdOKFuGT8tHyzqr4ImCMwCpA==",
+  "dgSpecHash": "+hI4fsVUmVaD0oLXlPpAcjXpJ3CAhdfVuHLgT+mihXJQTQGwgFSlZbEWrq7akORDIHZ99kMpSZZ8CqMsVKFViQ==",
   "success": true,
   "projectFilePath": "C:\\Users\\admin\\Documents\\Godot\\Awaw engine\\Awaw engine.csproj",
   "expectedPackageFiles": [
-    "C:\\Users\\admin\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.0\\microsoft.netframework.referenceassemblies.1.0.0.nupkg.sha512",
-    "C:\\Users\\admin\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net472\\1.0.0\\microsoft.netframework.referenceassemblies.net472.1.0.0.nupkg.sha512"
+    "C:\\Users\\admin\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.2\\microsoft.netframework.referenceassemblies.1.0.2.nupkg.sha512",
+    "C:\\Users\\admin\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net472\\1.0.2\\microsoft.netframework.referenceassemblies.net472.1.0.2.nupkg.sha512"
   ],
   "logs": []
 }

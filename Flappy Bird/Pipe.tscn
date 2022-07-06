@@ -4,7 +4,7 @@
 [ext_resource path="res://Flappy Bird/Pipe.gd" type="Script" id=2]
 
 [sub_resource type="RectangleShape2D" id=1]
-extents = Vector2( 223, 2160 )
+extents = Vector2( 211, 2160 )
 
 [node name="Pipe" type="StaticBody2D"]
 collision_layer = 2
@@ -18,5 +18,5 @@ flip_v = true
 region_rect = Rect2( 302, 0, 26, 135 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2( 225, 2160 )
+position = Vector2( 213, 2160 )
 shape = SubResource( 1 )

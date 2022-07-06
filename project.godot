@@ -17,6 +17,7 @@ config/icon="res://man face white background.png"
 [autoload]
 
 g="*res://Chess/global.gd"
+P="*res://Flappy Bird/parameters.gd"
 
 [display]
 

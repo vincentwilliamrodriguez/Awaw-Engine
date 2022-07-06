@@ -18,4 +18,4 @@ func _physics_process(delta):
 	if position.x <= -2560:
 		queue_free()
 	
-	position.x -= 1000 * delta
+	position.x -= P.SPEED * delta

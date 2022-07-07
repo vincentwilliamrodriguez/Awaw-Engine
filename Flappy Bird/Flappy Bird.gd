@@ -37,9 +37,11 @@ func AddBird(n):
 	
 	b.name = str(generation)+' '+str(n)
 	b.position = Vector2(640,2356)
+	b.VB = get_node("Vanished Birds")
 	b.connect("gameOver", self, "NextBird")
 	
 	$Birds.add_child(b)
+	return b
 	
 func AddPipes():
 	var ymin = max(500, last_top_y - P.PIPE_Y_RANGE)
@@ -57,23 +59,42 @@ func AddPipes():
 
 	last_top_y = top_y
 
-func NextBird(bird):
+func NextBird(_bird):
 	birds_alive -= 1
 	if birds_alive > 0:
 		UpdateNNV($Birds.get_child(0).brain)
 	if birds_alive == 0:
-		GameOver(bird)
+		GameOver()
 
-func GameOver(bird):
+func GameOver():
 	for pipe in $Pipes.get_children():
 		pipe.free()
-	
+		
 	ResetVariables()
 	NewPipe()
 	generation += 1
 	
+	var time_score_sum = 0
+	for bird in $"Vanished Birds".get_children():
+		time_score_sum += bird.timeScore
+		bird.timeScore2 = time_score_sum
+	
 	for n in P.BIRDS_N:
-		AddBird(n)
+		rng.randomize()
+		var r = rng.randi_range(1, time_score_sum)
+		for bird in $"Vanished Birds".get_children():
+			if r <= bird.timeScore2:
+				var new_bird = AddBird(n)
+				var new_brain = bird.brain.Duplication()
+				new_brain.Mutate()
+				new_bird.brain = new_brain
+				break
+		
+	for bird in $"Vanished Birds".get_children():
+		bird.queue_free()
+	
+#	for n in P.BIRDS_N:
+#		AddBird(n)
 		
 	UpdateNNV($Birds.get_node(str(generation) + ' 0').brain)
 	

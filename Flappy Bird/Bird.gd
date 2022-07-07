@@ -3,10 +3,14 @@ extends KinematicBody2D
 var BR = preload("res://Flappy Bird/Brain.cs")
 
 var v = Vector2(0,0)
-var isAI = false
 var brain
 var rng = RandomNumberGenerator.new()
 var nearest_pipe = null
+var fitness
+var timeStarted = OS.get_ticks_msec()
+var timeScore
+var VB
+var timeScore2
 
 signal gameOver
 
@@ -21,6 +25,7 @@ func _physics_process(delta):
 	var collided = move_and_collide(v * delta)
 	
 	if collided:
+		set_physics_process(false)
 		GameOver()
 	
 	if v.y < P.ROTATION_THRESHOLD:
@@ -38,10 +43,12 @@ func Apply(x, y):
 	v += Vector2(x, y)
 
 func GameOver():
-	if !isAI:
-		emit_signal("gameOver", self)
-	queue_free()
-	brain.queue_free()
+	timeScore = OS.get_ticks_msec() - timeStarted
+	emit_signal("gameOver", self)
+	
+	get_parent().remove_child(self)
+	VB.add_child(self)
+	hide()
 
 func Jump():
 	if position.y > 0:

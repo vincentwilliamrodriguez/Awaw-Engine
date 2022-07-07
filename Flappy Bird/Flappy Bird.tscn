@@ -68,8 +68,7 @@ shape = SubResource( 1 )
 [node name="Birds" type="CanvasLayer" parent="."]
 layer = 0
 
-[node name="PipeTimer" type="Timer" parent="."]
-one_shot = true
+[node name="Vanished Birds" type="CanvasLayer" parent="."]
 
 [node name="GUI" type="CanvasLayer" parent="."]
 layer = 2
@@ -78,7 +77,8 @@ layer = 2
 anchor_top = 1.0
 anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = -741.0
+margin_top = -911.0
+margin_bottom = -170.0
 
 [node name="Label" type="Label" parent="GUI/CenterContainer"]
 margin_left = 905.0
@@ -92,6 +92,9 @@ Generation:
 Alive:"
 
 [node name="NNV" parent="." instance=ExtResource( 5 )]
+
+[node name="PipeTimer" type="Timer" parent="."]
+one_shot = true
 
 [connection signal="timeout" from="PipeTimer" to="." method="NewPipe"]
 

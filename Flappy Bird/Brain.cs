@@ -9,10 +9,9 @@ public class Brain : Node
 	float[][] neurons;
 	float[][] biases;
 	float[][][] weights;
-	int fitness = 0;
 	
 	static Random random = new Random();
-	static float MUTATION_RATE = (float) 0.1;
+	static float MUTATION_RATE = (float) 0.4;
 
 	public void Init(int[] layers){
 		this.layers = (int[]) layers.Clone();
@@ -91,7 +90,7 @@ public class Brain : Node
 	}
 	
 	public float Activate(float n){
-		return (float) Math.Tanh(n);
+		return (float) (1 / (1 + Math.Exp(-n)));
 	}
 	
 	public Brain Duplication(){

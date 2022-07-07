@@ -41,6 +41,10 @@ config/ask_no_python=true
 
 singletons=[  ]
 
+[global]
+
+window=false
+
 [input]
 
 click={

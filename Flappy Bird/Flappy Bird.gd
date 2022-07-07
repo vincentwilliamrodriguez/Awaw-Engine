@@ -7,15 +7,17 @@ var rng = RandomNumberGenerator.new()
 var pipe_number = 1
 var last_top_y = (4711 - P.GAP) / 2.0
 var general_score = 0
-var bird_n = 1
+var generation = 1
+var birds_alive = P.BIRDS_N
 
 func _ready():
 	$PipeTimer.wait_time = P.PIPE_TIMER
 	NewPipe()
 	
-	for n in 1:
-		AddBird(bird_n)
-		UpdateNNV($Birds.get_node(str(bird_n)).brain)
+	for n in P.BIRDS_N:
+		AddBird(n)
+		
+	UpdateNNV($Birds.get_node(str(generation) + ' 0').brain)
 
 func _process(_delta):
 	get_node("GUI/CenterContainer/Label").text = str(general_score)
@@ -23,9 +25,9 @@ func _process(_delta):
 func AddBird(n):
 	var b = bird_scene.instance()
 	
-	b.name = str(n)
+	b.name = str(generation)+' '+str(n)
 	b.position = Vector2(640,2356)
-	b.connect("gameOver", self, "GameOver")
+	b.connect("gameOver", self, "NextBird")
 	
 	$Birds.add_child(b)
 	
@@ -45,16 +47,23 @@ func AddPipes():
 
 	last_top_y = top_y
 
-func GameOver():
+func NextBird(bird):
+	birds_alive -= 1
+	if birds_alive == 0:
+		GameOver(bird)
+
+func GameOver(bird):
 	for pipe in $Pipes.get_children():
 		pipe.queue_free()
-	
+		
 	ResetVariables()
+	generation += 1
 	
-	bird_n += 1
-	AddBird(bird_n)
-	UpdateNNV($Birds.get_node(str(bird_n)).brain)
-
+	for n in P.BIRDS_N:
+		AddBird(n)
+		
+	UpdateNNV($Birds.get_node(str(generation) + ' 0').brain)
+	
 func NewPipe():
 	AddPipes()
 	pipe_number += 1
@@ -64,6 +73,7 @@ func ResetVariables():
 	pipe_number = 1
 	last_top_y = (4711 - P.GAP) / 2.0
 	general_score = 0
+	birds_alive = P.BIRDS_N
 
 func Score(number):
 	general_score = number

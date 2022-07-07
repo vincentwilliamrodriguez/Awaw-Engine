@@ -8,7 +8,8 @@ func _ready():
 	GenerateCoordinates()
 	
 func _process(_delta):
-	update()
+	if is_instance_valid(NN):
+		update()
 
 func _draw():
 	for i in coordinates.size():

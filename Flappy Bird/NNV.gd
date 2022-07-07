@@ -19,7 +19,7 @@ func _draw():
 					var wn = (w + 1) / 2.0
 					var w_color = Color(1 - wn,0,wn)
 					
-					draw_line(coordinates[i][j], coordinates[i - 1][k], w_color, 19 * abs(w) + 1, true)
+					draw_line(coordinates[i][j], coordinates[i - 1][k], w_color, 20 * abs(w), true)
 			
 			
 			var n = NN.Retrieve("neurons", i, j)

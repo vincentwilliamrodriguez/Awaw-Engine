@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 
 public class Brain : Node
 {
@@ -8,25 +9,16 @@ public class Brain : Node
 	float[][] neurons;
 	float[][] biases;
 	float[][][] weights;
-	int[] activations;
 	int fitness = 0;
+	
+	static Random random = new Random();
+	static float MUTATION_RATE = (float) 0.1;
 
 	public void Init(int[] layers){
 		this.layers = (int[]) layers.Clone();
 		InitNeurons();
 		InitBiases();
 		InitWeights();
-		
-//		for (int i = 0; i < layers.Length; i++){
-//			PrintArray(biases[i]);
-//		}
-//		GD.Print();
-//		for (int i = 0; i < layers.Length; i++){
-//			for (int j = 0; j < layers[i]; j++){
-//				GD.Print(i, " ", j);
-//				PrintArray(weights[i][j]);
-//			}
-//		}
 	}
 
 	private void InitNeurons(){
@@ -103,8 +95,44 @@ public class Brain : Node
 		return (float) Math.Tanh(n);
 	}
 	
+	public Brain Duplication(){
+		var res = new Brain();
+		res.Init(layers);
+		
+		for (int i = 0; i < layers.Length; i++){
+			for (int j = 0; j < layers[i]; j++){
+				res.biases[i][j] = biases[i][j];
+				
+				if (i != 0){
+					for (int k = 0; k < layers[i - 1]; k++){
+						res.weights[i][j][k] = weights[i][j][k];
+					}
+				}
+			} 
+		}
+		
+		return res;
+	}
+	
+	public void Mutate(){
+		for (int i = 0; i < layers.Length; i++){
+			for (int j = 0; j < layers[i]; j++){
+				if (random.NextDouble() < MUTATION_RATE){
+					biases[i][j] = NextFloat((float) -1, (float) 1);
+				}
+				
+				if (i != 0){
+					for (int k = 0; k < layers[i - 1]; k++){
+						if (random.NextDouble() < MUTATION_RATE){
+							weights[i][j][k] = NextFloat((float) -1, (float) 1);
+						}
+					}
+				}
+			} 
+		}
+	}
+	
 	private static float NextFloat(float min, float max){
-		Random random = new Random();
 		return (float) random.NextDouble() * (max - min) + min;
 	}
 	
@@ -131,7 +159,7 @@ public class Brain : Node
 				break;
 				
 			default:
-				throw new System.ComponentModel.InvalidEnumArgumentException();
+				throw new InvalidEnumArgumentException();
 		}
 		
 		return res[i][j];
@@ -146,7 +174,7 @@ public class Brain : Node
 				break;
 				
 			default:
-				throw new System.ComponentModel.InvalidEnumArgumentException();
+				throw new InvalidEnumArgumentException();
 		}
 		
 		return res[i][j][k];

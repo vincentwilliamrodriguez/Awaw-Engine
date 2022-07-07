@@ -70,3 +70,8 @@ func Score(number):
 
 func UpdateNNV(inp):
 	get_node("NNV/Node2D").UpdateNN(inp)
+
+#	var mut = inp.Duplication()
+#	mut.Mutate()
+#	mut.FeedForward([0.5, -0.5, 1])
+#	get_node("NNV2/Node2D").UpdateNN(mut)

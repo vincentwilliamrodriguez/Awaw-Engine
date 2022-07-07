@@ -10,8 +10,8 @@ signal gameOver
 
 func _ready():
 	brain = BR.new()
-	brain.Init(PoolIntArray([3,4,1]))
-	print(brain.FeedForward([0.5, -0.5, 1]))
+	brain.Init(P.DEFAULT_NN_SIZE)
+	brain.FeedForward([0.5, -0.5, 1])
 
 func _physics_process(delta):
 	Apply(0, P.GRAVITY * delta)
@@ -39,3 +39,4 @@ func GameOver():
 	if !isAI:
 		emit_signal("gameOver")
 	queue_free()
+	brain.queue_free()

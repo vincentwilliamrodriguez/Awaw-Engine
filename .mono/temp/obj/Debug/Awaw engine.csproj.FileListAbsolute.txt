@@ -7,3 +7,5 @@ C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.dll
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.pdb
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.csproj.AssemblyReference.cache
 C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\bin\Debug\Newtonsoft.Json.dll
+C:\Users\admin\Documents\Godot\Awaw engine\.mono\temp\obj\Debug\Awaw engine.csproj.CopyComplete

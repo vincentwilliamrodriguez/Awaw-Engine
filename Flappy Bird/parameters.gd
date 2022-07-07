@@ -9,3 +9,5 @@ const PIPE_TIMER = 1.5
 const PIPE_Y_RANGE = 2000
 const SPEED = 853
 const ROTATION_THRESHOLD = 3000
+const DEFAULT_NN_SIZE = PoolIntArray([3,4,1])
+const MUTATION_RATE = 0.5

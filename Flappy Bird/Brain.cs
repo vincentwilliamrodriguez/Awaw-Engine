@@ -17,16 +17,16 @@ public class Brain : Node
 		InitBiases();
 		InitWeights();
 		
-		for (int i = 0; i < layers.Length; i++){
-			PrintArray(biases[i]);
-		}
-		GD.Print();
-		for (int i = 0; i < layers.Length; i++){
-			for (int j = 0; j < layers[i]; j++){
-				GD.Print(i, " ", j);
-				PrintArray(weights[i][j]);
-			}
-		}
+//		for (int i = 0; i < layers.Length; i++){
+//			PrintArray(biases[i]);
+//		}
+//		GD.Print();
+//		for (int i = 0; i < layers.Length; i++){
+//			for (int j = 0; j < layers[i]; j++){
+//				GD.Print(i, " ", j);
+//				PrintArray(weights[i][j]);
+//			}
+//		}
 	}
 
 	private void InitNeurons(){
@@ -46,7 +46,7 @@ public class Brain : Node
 			float[] bias_layer = new float[layers[i]];
 			
 			for (int j = 0; j < layers[i]; j++){
-				bias_layer[j] = NextFloat((float) -0.5, (float) 0.5);
+				bias_layer[j] = NextFloat((float) -1, (float) 1);
 			}
 			
 			res.Add(bias_layer);
@@ -66,8 +66,7 @@ public class Brain : Node
 				float[] weights_neuron = new float[previous_neurons];
 				
 				for (int k = 0; k < previous_neurons; k++){
-					GD.Print(previous_neurons);
-					weights_neuron[k] = NextFloat((float) -0.5, (float) 0.5);
+					weights_neuron[k] = NextFloat((float) -1, (float) 1);
 				}
 				
 				weights_layer.Add(weights_neuron);
@@ -77,6 +76,31 @@ public class Brain : Node
 		}
 		
 		weights = res.ToArray();
+	}
+	
+	public float[] FeedForward(float[] input_layer){
+		for (int j = 0; j < layers[0]; j++){
+			neurons[0][j] = input_layer[j];
+		}
+		
+		for (int i = 1; i < layers.Length; i++){
+			for (int j = 0; j < layers[i]; j++){
+				float neuron_value = 0;
+				
+				for (int k = 0; k < layers[i - 1]; k++){
+					neuron_value += weights[i][j][k] * neurons[i][j];
+				}
+				
+				neuron_value += biases[i][j];
+				neurons[i][j] = Activate(neuron_value);
+			}
+		}
+		
+		return neurons[layers.Length - 1];
+	}
+	
+	public float Activate(float n){
+		return (float) Math.Tanh(n);
 	}
 	
 	private static float NextFloat(float min, float max){
@@ -92,5 +116,39 @@ public class Brain : Node
 		}
 		
 		GD.Print(res);
+	}
+	
+	public float Retrieve(string inp_name, int i, int j){
+		float[][] res;
+		
+		switch (inp_name){
+			case "neurons":
+				res = neurons;
+				break;
+				
+			case "biases":
+				res = biases;
+				break;
+				
+			default:
+				throw new System.ComponentModel.InvalidEnumArgumentException();
+		}
+		
+		return res[i][j];
+	}
+	
+	public float Retrieve(string inp_name, int i, int j, int k){
+		float[][][] res;
+		
+		switch (inp_name){
+			case "weights":
+				res = weights;
+				break;
+				
+			default:
+				throw new System.ComponentModel.InvalidEnumArgumentException();
+		}
+		
+		return res[i][j][k];
 	}
 }

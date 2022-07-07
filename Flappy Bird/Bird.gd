@@ -1,12 +1,17 @@
 extends KinematicBody2D
 
+var BR = preload("res://Flappy Bird/Brain.cs")
+
 var v = Vector2(0,0)
 var isAI = false
+var brain
 
 signal gameOver
 
 func _ready():
-	pass # Replace with function body.
+	brain = BR.new()
+	brain.Init(PoolIntArray([3,4,1]))
+	print(brain.FeedForward([0.5, -0.5, 1]))
 
 func _physics_process(delta):
 	Apply(0, P.GRAVITY * delta)
@@ -24,7 +29,8 @@ func _physics_process(delta):
 
 func _input(event):
 	if event.is_action_pressed("click") or event.is_action_pressed("space"):
-		v.y = P.JUMP_HEIGHT
+		if position.y > 0:
+			v.y = P.JUMP_HEIGHT
 
 func Apply(x, y):
 	v += Vector2(x, y)

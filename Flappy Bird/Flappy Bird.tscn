@@ -1,9 +1,10 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=8 format=2]
 
 [ext_resource path="res://Flappy Bird/res/Flappy Bird Spritesheet.png" type="Texture" id=1]
 [ext_resource path="res://Flappy Bird/Flappy Bird.gd" type="Script" id=2]
 [ext_resource path="res://Arima-VariableFont_wght.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://Flappy Bird/Floor.gd" type="Script" id=4]
+[ext_resource path="res://Flappy Bird/NNV.tscn" type="PackedScene" id=5]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 1288.5, 53 )
@@ -74,8 +75,10 @@ one_shot = true
 layer = 2
 
 [node name="CenterContainer" type="CenterContainer" parent="GUI"]
+anchor_top = 1.0
 anchor_right = 1.0
-margin_bottom = 378.0
+anchor_bottom = 1.0
+margin_top = -639.0
 
 [node name="Label" type="Label" parent="GUI/CenterContainer"]
 margin_left = 239.0
@@ -86,4 +89,8 @@ custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_fonts/font = SubResource( 2 )
 text = "Awaw Score"
 
+[node name="NNV" parent="." instance=ExtResource( 5 )]
+
 [connection signal="timeout" from="PipeTimer" to="." method="NewPipe"]
+
+[editable path="NNV"]

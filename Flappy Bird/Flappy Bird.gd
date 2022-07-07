@@ -2,24 +2,22 @@ extends Node2D
 
 var bird_scene = preload("res://Flappy Bird/Bird.tscn")
 var pipe_scene = preload("res://Flappy Bird/Pipe.tscn")
+var NNV_scene = preload("res://Flappy Bird/NNV.tscn")
 var rng = RandomNumberGenerator.new()
 var pipe_number = 1
-var last_top_y = (4711 - P.GAP) / 2
+var last_top_y = (4711 - P.GAP) / 2.0
 var general_score = 0
-
-var BR = preload("res://Flappy Bird/Brain.cs")
+var bird_n = 1
 
 func _ready():
 	$PipeTimer.wait_time = P.PIPE_TIMER
 	NewPipe()
 	
 	for n in 1:
-		AddBird(n)
-		
-	var bird_brain = BR.new()
-	bird_brain.Init(PoolIntArray([1,2,3]))
+		AddBird(bird_n)
+		UpdateNNV($Birds.get_node(str(bird_n)).brain)
 
-func _process(delta):
+func _process(_delta):
 	get_node("GUI/CenterContainer/Label").text = str(general_score)
 
 func AddBird(n):
@@ -52,7 +50,10 @@ func GameOver():
 		pipe.queue_free()
 	
 	ResetVariables()
-	AddBird(1)
+	
+	bird_n += 1
+	AddBird(bird_n)
+	UpdateNNV($Birds.get_node(str(bird_n)).brain)
 
 func NewPipe():
 	AddPipes()
@@ -61,8 +62,11 @@ func NewPipe():
 
 func ResetVariables():
 	pipe_number = 1
-	last_top_y = (4711 - P.GAP) / 2
+	last_top_y = (4711 - P.GAP) / 2.0
 	general_score = 0
 
 func Score(number):
 	general_score = number
+
+func UpdateNNV(inp):
+	get_node("NNV/Node2D").UpdateNN(inp)

@@ -6,13 +6,13 @@ var v = Vector2(0,0)
 var isAI = false
 var brain
 var rng = RandomNumberGenerator.new()
+var nearest_pipe = null
 
 signal gameOver
 
 func _ready():
 	brain = BR.new()
 	brain.Init(P.DEFAULT_NN_SIZE)
-	brain.FeedForward([0.5, -0.5, 1, 0.5])
 
 func _physics_process(delta):
 	Apply(0, P.GRAVITY * delta)
@@ -48,6 +48,12 @@ func Jump():
 		v.y = P.JUMP_HEIGHT
 
 func Think():
-	rng.randomize()
-	if rng.randf() < 0.05:
-		Jump()
+	if is_instance_valid(nearest_pipe):
+		var bird_y = inverse_lerp(0, 5689, position.y)
+		var pipe_x = inverse_lerp(0, 2560, nearest_pipe.position.x)
+		var top_y = inverse_lerp(0, 5689, nearest_pipe.position.y)
+		var bottom_y = inverse_lerp(0, 5689, nearest_pipe.position.y + P.GAP)
+		var output = brain.FeedForward([bird_y, pipe_x, top_y, bottom_y])
+		
+		if output[0] > 0.5:
+			Jump()

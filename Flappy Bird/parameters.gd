@@ -11,4 +11,4 @@ const SPEED = 853
 const ROTATION_THRESHOLD = 3000
 const DEFAULT_NN_SIZE = PoolIntArray([4,4,1])
 const MUTATION_RATE = 0.5
-const BIRDS_N = 5
+const BIRDS_N = 200

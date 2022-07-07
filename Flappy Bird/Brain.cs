@@ -80,14 +80,13 @@ public class Brain : Node
 				float neuron_value = 0;
 				
 				for (int k = 0; k < layers[i - 1]; k++){
-					neuron_value += weights[i][j][k] * neurons[i][j];
+					neuron_value += weights[i][j][k] * neurons[i - 1][k];
 				}
 				
 				neuron_value += biases[i][j];
 				neurons[i][j] = Activate(neuron_value);
 			}
 		}
-		
 		return neurons[layers.Length - 1];
 	}
 	

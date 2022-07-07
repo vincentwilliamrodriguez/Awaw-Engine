@@ -9,6 +9,7 @@ var last_top_y = (4711 - P.GAP) / 2.0
 var general_score = 0
 var generation = 1
 var birds_alive = P.BIRDS_N
+var nearest_pipe = null
 
 func _ready():
 	$PipeTimer.wait_time = P.PIPE_TIMER
@@ -20,7 +21,16 @@ func _ready():
 	UpdateNNV($Birds.get_node(str(generation) + ' 0').brain)
 
 func _process(_delta):
-	get_node("GUI/CenterContainer/Label").text = str(general_score)
+	var display_text = "Score: %s\nGeneration: %s\nAlive: %s" % [general_score, generation, birds_alive]
+	get_node("GUI/CenterContainer/Label").text = display_text
+	
+	for p in $Pipes.get_children():
+		if p.position.x > 640:
+			nearest_pipe = p
+			break
+			
+	for b in $Birds.get_children():
+		b.nearest_pipe = nearest_pipe
 
 func AddBird(n):
 	var b = bird_scene.instance()
@@ -49,14 +59,17 @@ func AddPipes():
 
 func NextBird(bird):
 	birds_alive -= 1
+	if birds_alive > 0:
+		UpdateNNV($Birds.get_child(0).brain)
 	if birds_alive == 0:
 		GameOver(bird)
 
 func GameOver(bird):
 	for pipe in $Pipes.get_children():
-		pipe.queue_free()
-		
+		pipe.free()
+	
 	ResetVariables()
+	NewPipe()
 	generation += 1
 	
 	for n in P.BIRDS_N:

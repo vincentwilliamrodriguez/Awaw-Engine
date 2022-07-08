@@ -21,7 +21,7 @@ func Init(state, number, y):
 	pipe_state = state
 	
 func _physics_process(delta):
-	position.x -= 1000 * delta
+	position.x -= P.SPEED * delta
 	
 	if !passed and position.x < 640 and !pipe_state:
 		emit_signal("score", pipe_number)

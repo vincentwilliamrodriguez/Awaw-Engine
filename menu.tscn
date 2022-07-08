@@ -47,7 +47,7 @@ text = "Awaw Chess Engine"
 margin_top = 424.0
 margin_right = 1531.0
 margin_bottom = 720.0
-text = "Flappy Bird NEAT"
+text = "Flappy Bird NE"
 
 [connection signal="pressed" from="VBoxContainer/Awaw Chess" to="." method="_on_Awaw_Chess_pressed"]
 [connection signal="pressed" from="VBoxContainer/Flappy Bird" to="." method="_on_Flappy_Bird_pressed"]

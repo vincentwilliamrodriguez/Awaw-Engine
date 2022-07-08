@@ -1,15 +1,17 @@
-[gd_scene load_steps=7 format=2]
+[gd_scene load_steps=9 format=2]
 
 [ext_resource path="res://Flappy Bird/res/Flappy Bird Spritesheet.png" type="Texture" id=1]
 [ext_resource path="res://Flappy Bird/Flappy Bird.gd" type="Script" id=2]
 [ext_resource path="res://Arima-VariableFont_wght.ttf" type="DynamicFontData" id=3]
 [ext_resource path="res://Flappy Bird/Floor.gd" type="Script" id=4]
+[ext_resource path="res://Flappy Bird/NNV.tscn" type="PackedScene" id=5]
+[ext_resource path="res://Flappy Bird/res/Clock-1.png" type="Texture" id=6]
 
 [sub_resource type="RectangleShape2D" id=1]
 extents = Vector2( 1288.5, 53 )
 
 [sub_resource type="DynamicFont" id=2]
-size = 391
+size = 150
 outline_size = 5
 outline_color = Color( 0, 0, 0, 1 )
 use_filter = true
@@ -67,23 +69,49 @@ shape = SubResource( 1 )
 [node name="Birds" type="CanvasLayer" parent="."]
 layer = 0
 
-[node name="PipeTimer" type="Timer" parent="."]
-one_shot = true
+[node name="Vanished Birds" type="CanvasLayer" parent="."]
 
 [node name="GUI" type="CanvasLayer" parent="."]
 layer = 2
 
 [node name="CenterContainer" type="CenterContainer" parent="GUI"]
+anchor_top = 1.0
 anchor_right = 1.0
-margin_bottom = 378.0
+anchor_bottom = 1.0
+margin_top = -911.0
+margin_bottom = -170.0
 
 [node name="Label" type="Label" parent="GUI/CenterContainer"]
-margin_left = 239.0
-margin_right = 2321.0
-margin_bottom = 639.0
+margin_left = 905.0
+margin_right = 1655.0
+margin_bottom = 741.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_fonts/font = SubResource( 2 )
-text = "Awaw Score"
+text = "Score:
+Generation:
+Alive:"
+
+[node name="MarginContainer" type="MarginContainer" parent="GUI"]
+anchor_right = 1.0
+margin_bottom = 16.0
+
+[node name="HSlider" type="HSlider" parent="GUI/MarginContainer"]
+margin_right = 2560.0
+margin_bottom = 160.0
+custom_icons/grabber_disabled = ExtResource( 6 )
+custom_icons/grabber_highlight = ExtResource( 6 )
+custom_icons/grabber = ExtResource( 6 )
+min_value = 0.5
+max_value = 10.0
+step = 0.0
+value = 1.0
+
+[node name="NNV" parent="." instance=ExtResource( 5 )]
+
+[node name="PipeTimer" type="Timer" parent="."]
+one_shot = true
 
 [connection signal="timeout" from="PipeTimer" to="." method="NewPipe"]
+
+[editable path="NNV"]

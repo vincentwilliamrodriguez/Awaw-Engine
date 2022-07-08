@@ -116,13 +116,13 @@ public class Brain : Node
 		for (int i = 0; i < layers.Length; i++){
 			for (int j = 0; j < layers[i]; j++){
 				if (random.NextDouble() < MUTATION_RATE){
-					biases[i][j] = NextFloat((float) -1, (float) 1);
+					biases[i][j] += NextFloat((float) -0.1, (float) 0.1);
 				}
 				
 				if (i != 0){
 					for (int k = 0; k < layers[i - 1]; k++){
 						if (random.NextDouble() < MUTATION_RATE){
-							weights[i][j][k] = NextFloat((float) -1, (float) 1);
+							weights[i][j][k] += NextFloat((float) -0.1, (float) 0.1);
 						}
 					}
 				}

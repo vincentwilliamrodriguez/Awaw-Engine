@@ -25,12 +25,14 @@ func _process(_delta):
 	get_node("GUI/CenterContainer/Label").text = display_text
 	
 	for p in $Pipes.get_children():
-		if p.position.x > 640:
+		if p.position.x > 70:
 			nearest_pipe = p
 			break
 			
 	for b in $Birds.get_children():
 		b.nearest_pipe = nearest_pipe
+		
+	Engine.time_scale = get_node("GUI/MarginContainer/HSlider").value
 
 func AddBird(n):
 	var b = bird_scene.instance()

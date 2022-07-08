@@ -44,6 +44,8 @@ func Apply(x, y):
 
 func GameOver():
 	timeScore = OS.get_ticks_msec() - timeStarted
+	timeScore *= Engine.time_scale
+	timeScore = max(1, timeScore - 1800)
 	emit_signal("gameOver", self)
 	
 	get_parent().remove_child(self)
@@ -60,7 +62,8 @@ func Think():
 		var pipe_x = inverse_lerp(0, 2560, nearest_pipe.position.x)
 		var top_y = inverse_lerp(0, 5689, nearest_pipe.position.y)
 		var bottom_y = inverse_lerp(0, 5689, nearest_pipe.position.y + P.GAP)
-		var output = brain.FeedForward([bird_y, pipe_x, top_y, bottom_y])
+		var v_y = inverse_lerp(P.V_LIMIT_UP, P.V_LIMIT_DOWN, v.y)
+		var output = brain.FeedForward([bird_y, pipe_x, top_y, bottom_y, v_y])
 		
 		if output[0] > 0.5:
 			Jump()

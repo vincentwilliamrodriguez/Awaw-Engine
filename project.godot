@@ -17,6 +17,7 @@ config/icon="res://man face white background.png"
 [autoload]
 
 g="*res://Chess/global.gd"
+P="*res://Flappy Bird/parameters.gd"
 
 [display]
 
@@ -39,6 +40,10 @@ config/ask_no_python=true
 [gdnative]
 
 singletons=[  ]
+
+[global]
+
+window=false
 
 [input]
 

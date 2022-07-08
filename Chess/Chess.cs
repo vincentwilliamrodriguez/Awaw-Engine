@@ -27,7 +27,7 @@ static class Auxilliary
 
 public class Chess: Node
 {
-    int[,] Pieces;
+	int[,] Pieces;
 	int[,] CastlingRules;
 	int[] EnPassant;
 	int[] range9;
@@ -151,26 +151,26 @@ public class Chess: Node
 		var m = inp.Count;
 		var n = inp[0].Count;
 
-        var res = new T[m, n];
-        for(int i = 0; i < m; i++){
-            for(int j = 0; j < n; j++){
-                res[i, j] = inp[i][j];
-            }
-        }
-        return res;
-    }
+		var res = new T[m, n];
+		for(int i = 0; i < m; i++){
+			for(int j = 0; j < n; j++){
+				res[i, j] = inp[i][j];
+			}
+		}
+		return res;
+	}
 
-    public int[] LocateKing(bool color){
-        for (int i = 0; i < 8; i++){
-            for (int j = 0; j < 8; j++){
-                if (Pieces[i, j] == (color ? 0 : 6)){
-                    return new int[] {i, j};
-                }
-            }
-        }
-                
-        return new int[] {9, 9};
-    }
+	public int[] LocateKing(bool color){
+		for (int i = 0; i < 8; i++){
+			for (int j = 0; j < 8; j++){
+				if (Pieces[i, j] == (color ? 0 : 6)){
+					return new int[] {i, j};
+				}
+			}
+		}
+				
+		return new int[] {9, 9};
+	}
 
 	private static bool GetColor(int piece){
 		return !Convert.ToBoolean(piece / 6);

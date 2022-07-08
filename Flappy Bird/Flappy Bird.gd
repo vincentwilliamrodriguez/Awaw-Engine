@@ -4,12 +4,15 @@ var bird_scene = preload("res://Flappy Bird/Bird.tscn")
 var pipe_scene = preload("res://Flappy Bird/Pipe.tscn")
 var NNV_scene = preload("res://Flappy Bird/NNV.tscn")
 var rng = RandomNumberGenerator.new()
+var dir = Directory.new()
 var pipe_number = 1
 var last_top_y = (4711 - P.GAP) / 2.0
 var general_score = 0
 var generation = 1
 var birds_alive = P.BIRDS_N
 var nearest_pipe = null
+var best_score = 0
+var history_csv = "Generation,BestTimeScore,AverageTimeScore\n"
 
 func _ready():
 	$PipeTimer.wait_time = P.PIPE_TIMER
@@ -21,8 +24,10 @@ func _ready():
 	UpdateNNV($Birds.get_node(str(generation) + ' 0').brain)
 
 func _process(_delta):
-	var display_text = "Score: %s\nGeneration: %s\nAlive: %s" % [general_score, generation, birds_alive]
-	get_node("GUI/CenterContainer/Label").text = display_text
+	var display_text1 = "Score: %s\nGeneration: %s" % [general_score, generation]
+	var display_text2 = "Alive: %s\nBest Score: %s" % [birds_alive, best_score]
+	get_node("GUI/Label1").text = display_text1
+	get_node("GUI/Label2").text = display_text2
 	
 	for p in $Pipes.get_children():
 		if p.position.x > 70:
@@ -34,6 +39,10 @@ func _process(_delta):
 		
 	Engine.time_scale = get_node("GUI/MarginContainer/HSlider").value
 
+func _input(event):
+	if event.is_action_pressed("r"):
+		get_node("GUI/MarginContainer/HSlider").value = 1
+	
 func AddBird(n):
 	var b = bird_scene.instance()
 	
@@ -71,15 +80,17 @@ func NextBird(_bird):
 func GameOver():
 	for pipe in $Pipes.get_children():
 		pipe.free()
-		
-	ResetVariables()
+	
 	NewPipe()
 	generation += 1
 	
 	var time_score_sum = 0
+	var best_time_score = 0
+	
 	for bird in $"Vanished Birds".get_children():
 		time_score_sum += bird.timeScore
 		bird.timeScore2 = time_score_sum
+		best_time_score = max(best_time_score, bird.timeScore)
 	
 	for n in P.BIRDS_N:
 		rng.randomize()
@@ -93,11 +104,14 @@ func GameOver():
 				break
 		
 	for bird in $"Vanished Birds".get_children():
+		bird.brain.queue_free()
 		bird.queue_free()
 	
-#	for n in P.BIRDS_N:
-#		AddBird(n)
-		
+	var history_line = "%s,%s,%s\n" % [generation - 1, best_time_score, time_score_sum / P.BIRDS_N]
+	history_csv += history_line
+	best_score = max(best_score, general_score)
+	
+	ResetVariables()
 	UpdateNNV($Birds.get_node(str(generation) + ' 0').brain)
 	
 func NewPipe():
@@ -112,12 +126,16 @@ func ResetVariables():
 	birds_alive = P.BIRDS_N
 
 func Score(number):
-	general_score = number
+	general_score += 1
 
 func UpdateNNV(inp):
 	get_node("NNV/Node2D").UpdateNN(inp)
 
-#	var mut = inp.Duplication()
-#	mut.Mutate()
-#	mut.FeedForward([0.5, -0.5, 1])
-#	get_node("NNV2/Node2D").UpdateNN(mut)
+func _notification(what):
+	if what == MainLoop.NOTIFICATION_WM_QUIT_REQUEST:
+		dir.remove("user://history.csv")
+		
+		var file = File.new()
+		file.open("user://history.csv", File.WRITE)
+		file.store_string(history_csv)
+		file.close()

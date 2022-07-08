@@ -74,25 +74,33 @@ layer = 0
 [node name="GUI" type="CanvasLayer" parent="."]
 layer = 2
 
-[node name="CenterContainer" type="CenterContainer" parent="GUI"]
+[node name="Label1" type="Label" parent="GUI"]
 anchor_top = 1.0
-anchor_right = 1.0
 anchor_bottom = 1.0
-margin_top = -911.0
-margin_bottom = -170.0
-
-[node name="Label" type="Label" parent="GUI/CenterContainer"]
-margin_left = 905.0
-margin_right = 1655.0
-margin_bottom = 741.0
+margin_top = -900.0
+margin_right = 750.0
 custom_colors/font_color = Color( 0, 0, 0, 1 )
 custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
 custom_fonts/font = SubResource( 2 )
 text = "Score:
-Generation:
-Alive:"
+Generation:"
+
+[node name="Label2" type="Label" parent="GUI"]
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+margin_left = -750.0
+margin_top = -900.0
+grow_horizontal = 0
+custom_colors/font_color = Color( 0, 0, 0, 1 )
+custom_colors/font_outline_modulate = Color( 0, 0, 0, 1 )
+custom_fonts/font = SubResource( 2 )
+text = "Alive:
+Best Score:"
 
 [node name="MarginContainer" type="MarginContainer" parent="GUI"]
+visible = false
 anchor_right = 1.0
 margin_bottom = 16.0
 

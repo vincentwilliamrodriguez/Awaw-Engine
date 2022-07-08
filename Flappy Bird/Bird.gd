@@ -24,7 +24,7 @@ func _physics_process(delta):
 	v.y = clamp(v.y, P.V_LIMIT_UP, P.V_LIMIT_DOWN)
 	var collided = move_and_collide(v * delta)
 	
-	if collided:
+	if collided or position.y < -214:
 		set_physics_process(false)
 		GameOver()
 	
@@ -46,11 +46,12 @@ func GameOver():
 	timeScore = OS.get_ticks_msec() - timeStarted
 	timeScore *= Engine.time_scale
 	timeScore = max(1, timeScore - 1800)
-	emit_signal("gameOver", self)
 	
 	get_parent().remove_child(self)
 	VB.add_child(self)
 	hide()
+	
+	emit_signal("gameOver", self)
 
 func Jump():
 	if position.y > 0:
@@ -65,5 +66,5 @@ func Think():
 		var v_y = inverse_lerp(P.V_LIMIT_UP, P.V_LIMIT_DOWN, v.y)
 		var output = brain.FeedForward([bird_y, pipe_x, top_y, bottom_y, v_y])
 		
-		if output[0] > 0.5:
+		if output[0] == 1:
 			Jump()

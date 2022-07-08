@@ -83,7 +83,11 @@ public class Brain : Node
 				}
 				
 				neuron_value += biases[i][j];
-				neurons[i][j] = Activate(neuron_value);
+				if (i == layers.Length - 1){
+					neurons[i][j] = ActivateStep(neuron_value);
+				} else {
+					neurons[i][j] = Activate(neuron_value);
+				}
 			}
 		}
 		return neurons[layers.Length - 1];
@@ -91,6 +95,10 @@ public class Brain : Node
 	
 	public float Activate(float n){
 		return (float) (1 / (1 + Math.Exp(-n)));
+	}
+	
+	public float ActivateStep(float n){
+		return (float) ((n > 0.5) ? 1 : 0);
 	}
 	
 	public Brain Duplication(){

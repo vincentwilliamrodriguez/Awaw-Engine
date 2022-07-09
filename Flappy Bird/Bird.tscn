@@ -1,7 +1,39 @@
-[gd_scene load_steps=8 format=2]
+[gd_scene load_steps=11 format=2]
 
 [ext_resource path="res://Flappy Bird/res/Birds.png" type="Texture" id=1]
 [ext_resource path="res://Flappy Bird/Bird.gd" type="Script" id=2]
+[ext_resource path="res://Flappy Bird/BirdSprite.gd" type="Script" id=3]
+
+[sub_resource type="Shader" id=6]
+code = "shader_type canvas_item;
+uniform float inpr = 0.811;
+uniform float inpg = 0.76;
+uniform float inpb = 0.172;
+const vec4 normal = vec4(207.0,194.0,44.0,255.0) / vec4(255.0,255.0,255.0,255.0);
+const vec4 light = vec4(220.0,228.0,177.0,255.0) / vec4(255.0,255.0,255.0,255.0);
+const vec4 dark = vec4(220.0,130.0,35.0,255.0) / vec4(255.0,255.0,255.0,255.0);
+
+void fragment(){
+	COLOR = texture(TEXTURE, UV);
+	
+	if (COLOR == normal){
+		COLOR = vec4(inpr, inpg, inpb, 1.0);
+	}
+	
+	if (COLOR == light){
+		COLOR = light - normal  + vec4(inpr, inpg, inpb, 1.0);
+	}
+
+	if (COLOR == dark){
+		COLOR = dark - normal  + vec4(inpr, inpg, inpb, 1.0);
+	}
+}"
+
+[sub_resource type="ShaderMaterial" id=7]
+shader = SubResource( 6 )
+shader_param/inpr = 0.811
+shader_param/inpg = 0.76
+shader_param/inpb = 0.172
 
 [sub_resource type="AtlasTexture" id=1]
 atlas = ExtResource( 1 )
@@ -33,10 +65,12 @@ collision_mask = 2
 script = ExtResource( 2 )
 
 [node name="Bird" type="AnimatedSprite" parent="."]
+material = SubResource( 7 )
 scale = Vector2( 17.77, 17.77 )
 frames = SubResource( 4 )
 frame = 1
 playing = true
+script = ExtResource( 3 )
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
 rotation = 1.5708

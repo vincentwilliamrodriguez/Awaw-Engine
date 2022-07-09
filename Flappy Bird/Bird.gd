@@ -20,6 +20,8 @@ func _ready():
 func InitBrain():
 	brain = BR.new()
 	brain.Init(P.DEFAULT_NN_SIZE)
+	rng.randomize()
+	UpdateColor(rng.randf(), rng.randf(), rng.randf())
 
 func _physics_process(delta):
 	Apply(0, P.GRAVITY * delta)
@@ -71,3 +73,9 @@ func Think():
 		
 		if output[0] == 1:
 			Jump()
+
+func UpdateColor(r, g, b):
+	$Bird.material.set_shader_param("inpr", r)
+	$Bird.material.set_shader_param("inpg", g)
+	$Bird.material.set_shader_param("inpb", b)
+	

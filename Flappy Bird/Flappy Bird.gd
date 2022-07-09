@@ -3,6 +3,7 @@ extends Node2D
 var bird_scene = preload("res://Flappy Bird/Bird.tscn")
 var pipe_scene = preload("res://Flappy Bird/Pipe.tscn")
 var NNV_scene = preload("res://Flappy Bird/NNV.tscn")
+var CO = preload("res://Flappy Bird/Crossover.cs").new()
 var rng = RandomNumberGenerator.new()
 var dir = Directory.new()
 var pipe_number = 1
@@ -19,7 +20,7 @@ func _ready():
 	NewPipe()
 	
 	for n in P.BIRDS_N:
-		AddBird(n)
+		AddBird(n, true)
 		
 	UpdateNNV($Birds.get_node(str(generation) + ' 0').brain)
 
@@ -30,7 +31,7 @@ func _process(_delta):
 	get_node("GUI/Label2").text = display_text2
 	
 	for p in $Pipes.get_children():
-		if p.position.x > 70:
+		if p.position.x > 90:
 			nearest_pipe = p
 			break
 			
@@ -43,12 +44,16 @@ func _input(event):
 	if event.is_action_pressed("r"):
 		get_node("GUI/MarginContainer/HSlider").value = 1
 	
-func AddBird(n):
+func AddBird(n, willInitBrain):
 	var b = bird_scene.instance()
 	
 	b.name = str(generation)+' '+str(n)
 	b.position = Vector2(640,2356)
 	b.VB = get_node("Vanished Birds")
+	
+	if willInitBrain:
+		b.InitBrain()
+		
 	b.connect("gameOver", self, "NextBird")
 	
 	$Birds.add_child(b)
@@ -84,28 +89,10 @@ func GameOver():
 	NewPipe()
 	generation += 1
 	
-	var time_score_sum = 0
-	var best_time_score = 0
+	CO.Run($"Vanished Birds".get_children(), self)
 	
-	for bird in $"Vanished Birds".get_children():
-		time_score_sum += bird.timeScore
-		bird.timeScore2 = time_score_sum
-		best_time_score = max(best_time_score, bird.timeScore)
-	
-	for n in P.BIRDS_N:
-		rng.randomize()
-		var r = rng.randi_range(1, time_score_sum)
-		for bird in $"Vanished Birds".get_children():
-			if r <= bird.timeScore2:
-				var new_bird = AddBird(n)
-				var new_brain = bird.brain.Duplication()
-				new_brain.Mutate()
-				new_bird.brain = new_brain
-				break
-		
-	for bird in $"Vanished Birds".get_children():
-		bird.brain.queue_free()
-		bird.queue_free()
+	var time_score_sum = CO.time_score_sum
+	var best_time_score = CO.best_time_score
 	
 	var history_line = "%s,%s,%s\n" % [generation - 1, best_time_score, time_score_sum / P.BIRDS_N]
 	history_csv += history_line
@@ -139,3 +126,7 @@ func _notification(what):
 		file.open("user://history.csv", File.WRITE)
 		file.store_string(history_csv)
 		file.close()
+
+func Randf(mini, maxi):
+	rng.randomize()
+	return rng.randf_range(mini, maxi)

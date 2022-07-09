@@ -6,15 +6,18 @@ var v = Vector2(0,0)
 var brain
 var rng = RandomNumberGenerator.new()
 var nearest_pipe = null
-var fitness
 var timeStarted = OS.get_ticks_msec()
 var timeScore
+var fitness
+var fitnessCu
 var VB
-var timeScore2
 
 signal gameOver
 
 func _ready():
+	pass
+	
+func InitBrain():
 	brain = BR.new()
 	brain.Init(P.DEFAULT_NN_SIZE)
 
@@ -45,7 +48,7 @@ func Apply(x, y):
 func GameOver():
 	timeScore = OS.get_ticks_msec() - timeStarted
 	timeScore *= Engine.time_scale
-	timeScore = max(1, timeScore - 1800)
+	timeScore = max(1, timeScore - (2060 / P.SPEED) * 1000)
 	
 	get_parent().remove_child(self)
 	VB.add_child(self)

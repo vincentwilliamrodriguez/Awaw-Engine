@@ -120,6 +120,27 @@ public class Brain : Node
 		return res;
 	}
 	
+	public Brain CrossoverWith(Brain inp){
+		var res = new Brain();
+		res.Init(layers);
+		
+		for (int i = 0; i < layers.Length; i++){
+			for (int j = 0; j < layers[i]; j++){
+				var biases_r = (random.NextDouble() < 0.5);
+				res.biases[i][j] = biases_r ? biases[i][j]: inp.biases[i][j];
+				
+				if (i != 0){
+					for (int k = 0; k < layers[i - 1]; k++){
+						var weights_r = (random.NextDouble() < 0.5);
+						res.weights[i][j][k] = weights_r ? weights[i][j][k]: inp.weights[i][j][k];
+					}
+				}
+			} 
+		}
+		
+		return res;
+	}
+	
 	public void Mutate(){
 		for (int i = 0; i < layers.Length; i++){
 			for (int j = 0; j < layers[i]; j++){

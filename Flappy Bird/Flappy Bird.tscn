@@ -114,6 +114,8 @@ min_value = 0.5
 max_value = 10.0
 step = 0.0
 value = 1.0
+editable = false
+scrollable = false
 
 [node name="NNV" parent="." instance=ExtResource( 5 )]
 

@@ -10,5 +10,4 @@ const PIPE_Y_RANGE = 2000
 const SPEED = 853
 const ROTATION_THRESHOLD = 3000
 const DEFAULT_NN_SIZE = PoolIntArray([5,4,1])
-const MUTATION_RATE = 0.5
 const BIRDS_N = 200

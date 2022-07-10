@@ -11,7 +11,7 @@ public class Brain : Node
 	float[][][] weights;
 	
 	static Random random = new Random();
-	static float MUTATION_RATE = (float) 0.4;
+	static float MUTATION_RATE = (float) 0.1;
 
 	public void Init(int[] layers){
 		this.layers = (int[]) layers.Clone();
@@ -83,7 +83,11 @@ public class Brain : Node
 				}
 				
 				neuron_value += biases[i][j];
-				neurons[i][j] = Activate(neuron_value);
+				if (i == layers.Length - 1){
+					neurons[i][j] = ActivateStep(neuron_value);
+				} else {
+					neurons[i][j] = Activate(neuron_value);
+				}
 			}
 		}
 		return neurons[layers.Length - 1];
@@ -91,6 +95,10 @@ public class Brain : Node
 	
 	public float Activate(float n){
 		return (float) (1 / (1 + Math.Exp(-n)));
+	}
+	
+	public float ActivateStep(float n){
+		return (float) ((n > 0.5) ? 1 : 0);
 	}
 	
 	public Brain Duplication(){
@@ -104,6 +112,27 @@ public class Brain : Node
 				if (i != 0){
 					for (int k = 0; k < layers[i - 1]; k++){
 						res.weights[i][j][k] = weights[i][j][k];
+					}
+				}
+			} 
+		}
+		
+		return res;
+	}
+	
+	public Brain CrossoverWith(Brain inp){
+		var res = new Brain();
+		res.Init(layers);
+		
+		for (int i = 0; i < layers.Length; i++){
+			for (int j = 0; j < layers[i]; j++){
+				var biases_r = (random.NextDouble() < 0.5);
+				res.biases[i][j] = biases_r ? biases[i][j]: inp.biases[i][j];
+				
+				if (i != 0){
+					for (int k = 0; k < layers[i - 1]; k++){
+						var weights_r = (random.NextDouble() < 0.5);
+						res.weights[i][j][k] = weights_r ? weights[i][j][k]: inp.weights[i][j][k];
 					}
 				}
 			} 

@@ -6,15 +6,18 @@ var v = Vector2(0,0)
 var brain
 var rng = RandomNumberGenerator.new()
 var nearest_pipe = null
-var fitness
 var timeStarted = OS.get_ticks_msec()
 var timeScore
+var fitness
+var fitnessCu
 var VB
-var timeScore2
 
 signal gameOver
 
 func _ready():
+	pass
+	
+func InitBrain():
 	brain = BR.new()
 	brain.Init(P.DEFAULT_NN_SIZE)
 
@@ -24,7 +27,7 @@ func _physics_process(delta):
 	v.y = clamp(v.y, P.V_LIMIT_UP, P.V_LIMIT_DOWN)
 	var collided = move_and_collide(v * delta)
 	
-	if collided:
+	if collided or position.y < -214:
 		set_physics_process(false)
 		GameOver()
 	
@@ -35,9 +38,9 @@ func _physics_process(delta):
 		
 	Think()
 
-func _input(event):
-	if event.is_action_pressed("click") or event.is_action_pressed("space"):
-		Jump()
+#func _input(event):
+#	if event.is_action_pressed("click") or event.is_action_pressed("space"):
+#		Jump()
 
 func Apply(x, y):
 	v += Vector2(x, y)
@@ -45,12 +48,13 @@ func Apply(x, y):
 func GameOver():
 	timeScore = OS.get_ticks_msec() - timeStarted
 	timeScore *= Engine.time_scale
-	timeScore = max(1, timeScore - 1800)
-	emit_signal("gameOver", self)
+	timeScore = max(1, timeScore - (2060 / P.SPEED) * 1000)
 	
 	get_parent().remove_child(self)
 	VB.add_child(self)
 	hide()
+	
+	emit_signal("gameOver", self)
 
 func Jump():
 	if position.y > 0:
@@ -65,5 +69,5 @@ func Think():
 		var v_y = inverse_lerp(P.V_LIMIT_UP, P.V_LIMIT_DOWN, v.y)
 		var output = brain.FeedForward([bird_y, pipe_x, top_y, bottom_y, v_y])
 		
-		if output[0] > 0.5:
+		if output[0] == 1:
 			Jump()

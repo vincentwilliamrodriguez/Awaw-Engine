@@ -35,7 +35,7 @@ script = ExtResource( 2 )
 [node name="Bird" type="AnimatedSprite" parent="."]
 scale = Vector2( 17.77, 17.77 )
 frames = SubResource( 4 )
-frame = 1
+frame = 3
 playing = true
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]

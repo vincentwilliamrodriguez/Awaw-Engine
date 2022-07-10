@@ -33,14 +33,16 @@ public class Crossover : Node
 				var r = (float) random.NextDouble() * fitness_sum;
 				foreach (Node bird in inp){
 					if (r < (float) bird.Get("fitnessCu")){
-						parents.Add((Node) bird.Get("brain"));
+						parents.Add(bird);
 						break;
 					}
 				}
 			}
 			
+			var old_brain_1 = (Node) parents[0].Get("brain");
+			var old_brain_2 = (Node) parents[1].Get("brain");
+			var new_brain = (Node) old_brain_1.Call("CrossoverWith", old_brain_2);
 			var new_bird = (Node) main.Call("AddBird", n, false);
-			var new_brain = (Node) parents[0].Call("CrossoverWith", parents[1]);
 			new_brain.Call("Mutate");
 			new_bird.Set("brain", new_brain);
 		}

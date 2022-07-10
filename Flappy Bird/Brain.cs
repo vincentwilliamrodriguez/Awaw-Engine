@@ -11,7 +11,7 @@ public class Brain : Node
 	float[][][] weights;
 	
 	static Random random = new Random();
-	static float MUTATION_RATE = (float) 0.4;
+	static float MUTATION_RATE = (float) 0.1;
 
 	public void Init(int[] layers){
 		this.layers = (int[]) layers.Clone();
